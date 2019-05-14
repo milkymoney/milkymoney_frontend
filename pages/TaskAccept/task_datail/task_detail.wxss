@@ -1,0 +1,36 @@
+/* pages/task_accept/task_datail/task_detail.wxss */
+.questionnaireTask{
+  margin-top:40rpx;
+  margin-bottom:40rpx; 
+}
+.navToQue{
+  margin-left: 30rpx;
+  margin-top: 30rpx;
+}
+.sub{
+  margin-top: 30rpx;
+  margin-left: 30rpx
+}
+
+
+.question-images {
+  display: flex;
+  align-items: center;
+  margin-top: 40rpx;
+  margin-left: 20rpx;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+}
+.q-image-wrap {
+  width: 31%;
+  margin-right: 10rpx;
+}
+.q-image {
+  flex: 1;
+  height: 200rpx;
+  width: 100%;
+}
+.q-image-remover {
+  text-align: center;
+  font-size:14px;
+}

@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/TaskRelease/main/main",
+    "pages/TaskRelease/task_datail/task_detail",
+    "pages/TaskAccept/main/main",
+    "pages/TaskAccept/task_datail/task_detail"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  },
+  "usingComponents": {
+    "van-tabbar": "./dist/tabbar/index",
+    "van-tabbar-item": "./dist/tabbar-item/index",
+    "van-button": "./dist/button/index",
+    "van-tree-select": "./dist/tree-select/index",
+    "van-search": "./dist/search/index",
+    "van-cell": "./dist/cell/index",
+    "van-cell-group": "./dist/cell-group/index",
+    "van-card": "./dist/card/index",
+    "van-tag": "./dist/tag/index",
+    "van-popup": "./dist/popup/index",
+    "van-picker": "./dist/picker/index",
+    "van-tab": "./dist/tab/index",
+    "van-tabs": "./dist/tabs/index",
+    "van-steps": "./dist/steps/index"
+  },
+  "navigateToMiniProgramAppIdList": [
+    "wxd947200f82267e58"
+  ],
+  "sitemapLocation": "sitemap.json"
+}

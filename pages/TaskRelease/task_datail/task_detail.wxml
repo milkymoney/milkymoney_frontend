@@ -1,0 +1,5 @@
+<!--pages/task_datail/task_detail.wxml-->
+<text>pages/task_datail/task_detail.wxml:{{itemID}}</text>
+<block>
+  这是任务详情界面
+</block>

@@ -1,0 +1,7 @@
+/* pages/main/main.wxss */
+.user-display{
+  margin-top: 10px
+}
+.deleteBut{
+  margin-top: 100px
+}

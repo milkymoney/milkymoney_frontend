@@ -1,0 +1,252 @@
+<!--pages/taskAccept/main/main.wxml-->
+<block wx:if="{{selection==0}}">
+  
+  <!--左上角定位，由于小程序只能获取经纬度，城市需要向第三方地图获取，所以该功能在以后迭代再完善-->
+  <van-cell title="{{location_city}}" icon="location-o" />
+  <!--接受任务主页-->
+  <!--搜索框-->
+  <van-search
+    value="{{ search_value_main }}"
+    placeholder="请输入搜索关键词"
+    use-action-slot
+    bind:change="onChangeMain"
+    bind:search="onSearchMain"
+    shape="round"
+  >
+    <view slot="action" bind:tap="onSearch">搜索</view>
+  </van-search>
+  
+  <van-cell title="推荐任务"  size="large" />
+  <!--下面是任务card-->
+  <view wx:for='{{taskList}}' wx:key="taskID">
+    <van-card
+      price="{{item.taskReward}}"
+      desc="{{item.taskInfo}}"
+      title="{{item.taskName}}"
+      thumb="{{ item.imageURL }}"
+    > 
+      <view slot="tags"  padding> 
+        <van-tag type="danger" wx:for="{{item.tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+      </view>
+      <view slot="footer">
+        <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
+      </view>
+    </van-card>
+  </view>
+</block>
+
+
+<block wx:if="{{selection==1}}">
+  <!--找任务-->
+  <!--搜索框-->
+  <van-search
+    value="{{ search_value_main }}"
+    placeholder="请输入搜索关键词"
+    use-action-slot
+    bind:change="onChangeMain"
+    bind:search="onSearchMain"
+    shape="round"
+  >
+    <view slot="action" bind:tap="onSearch">搜索</view>
+  </van-search>
+  <!--按筛选要求显示任务-->
+
+  <van-button bind:click="toggleBottomPopupArea" class="demo-margin-right demo-margin-left"  padding>选择区域</van-button>
+  <van-popup
+    show="{{ show.bottom }}"
+    position="bottom"
+    custom-class="bottom"
+    bind:close="toggleBottomPopup"
+    bind:transitionEnd="onTransitionEnd"
+    wx:if="{{selectedToogle=='areas'}}"
+  >
+    <van-picker 
+      show-toolbar
+      title="选择任务区域"
+      columns="{{ areas }}"  
+      bind:confirm="onConfirmArea"
+      bind:cancel="onCancel"/>
+  </van-popup>
+  <van-button bind:click="toggleBottomPopupTaskType" class="demo-margin-right" padding>选择任务类型</van-button>
+
+  <van-popup
+    show="{{ show.bottom }}"
+    position="bottom"
+    custom-class="bottom"
+    bind:close="toggleBottomPopup"
+    bind:transitionEnd="onTransitionEnd"
+    wx:if="{{selectedToogle=='taskType'}}"
+  >
+    <van-picker 
+      show-toolbar
+      title="选择任务类型"
+      columns="{{ taskType }}" 
+      bind:confirm="onConfirmTaskType"
+      bind:cancel="onCancel"/>
+  </van-popup>
+  
+
+  <van-button bind:click="toggleBottomPopupSortOrder" class="demo-margin-right" padding>选择排序方式</van-button>
+  <van-popup
+    show="{{ show.bottom }}"
+    position="bottom"
+    custom-class="bottom"
+    bind:close="toggleBottomPopup"
+    bind:transitionEnd="onTransitionEnd"
+    wx:if="{{selectedToogle=='sortOrder'}}"
+  >
+    <van-picker 
+      show-toolbar
+      title="选择排序方式"
+      columns="{{ sortOrder }}" 
+      bind:confirm="onConfirmSortOrder"
+      bind:cancel="onCancel"/>
+  </van-popup>
+  
+  <van-cell title="筛选方式" value="{{selectedInfo}}" />
+  <!--下面是筛选任务card-->
+  <view wx:for='{{seletcedTaskList}}' wx:key="taskID">
+    <van-card
+      price="{{item.taskReward}}"
+      desc="{{item.taskInfo}}"
+      title="{{item.taskName}}"
+      thumb="{{ item.imageURL }}"
+    > 
+      <view slot="tags"  padding>
+        <van-tag type="danger" wx:for="{{item.tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+      </view>
+      <view slot="footer">
+        <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
+      </view>
+    </van-card>
+  </view>
+
+</block>
+
+
+<block wx:if="{{selection==3}}">
+  <!--任务袋-->
+  <!--任务袋内搜索框-->
+  <van-search
+    value="{{ search_value_personal }}"
+    placeholder="请输入个人任务关键词"
+    use-action-slot
+    bind:change="onChangePersonalTask"
+    bind:search="onSearchPersonalTask"
+    shape="round"
+  >
+    <view slot="action" bind:tap="onSearchPersonalTask">搜索</view>
+  </van-search>
+
+  <van-tabs active="{{ 1 }}" bind:change="onChangeTab">
+    <van-tab title="待审核">
+      <view wx:for='{{myPendingTasks}}' wx:key="taskID">
+        <van-card
+          price="{{item.taskReward}}"
+          desc="{{item.taskInfo}}"
+          title="{{item.taskName}}"
+          thumb="{{ item.imageURL }}"
+        > 
+          <view slot="tags"  padding>
+            <van-tag type="danger" wx:for="{{item.tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+          </view>
+          <view slot="footer">
+            <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
+          </view>
+        </van-card>
+      </view>
+    </van-tab>
+    <van-tab title="待完成">
+      <view wx:for='{{myDoingTasks}}' wx:key="taskID">
+        <van-card
+          price="{{item.taskReward}}"
+          desc="{{item.taskInfo}}"
+          title="{{item.taskName}}"
+          thumb="{{ item.imageURL }}"
+        > 
+          <view slot="tags"  padding>
+            <van-tag type="danger" wx:for="{{item.tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+          </view>
+          <view slot="footer">
+            <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
+          </view>
+        </van-card>
+      </view>
+    </van-tab>
+    <van-tab title="待验收">
+      <view wx:for='{{myCheckingTasks}}' wx:key="taskID">
+        <van-card
+          price="{{item.taskReward}}"
+          desc="{{item.taskInfo}}"
+          title="{{item.taskName}}"
+          thumb="{{ item.imageURL }}"
+        > 
+          <view slot="tags"  padding>
+            <van-tag type="danger" wx:for="{{item.tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+          </view>
+          <view slot="footer">
+            <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
+          </view>
+        </van-card>
+      </view>
+    </van-tab>
+    <van-tab title="其他">
+      <view wx:for='{{myOtherTasks}}' wx:key="taskID">
+        <van-card
+          price="{{item.taskReward}}"
+          desc="{{item.taskInfo}}"
+          title="{{item.taskName}}"
+          thumb="{{ item.imageURL }}"
+        > 
+          <view slot="tags"  padding>
+            <van-tag type="danger" wx:for="{{item.tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+          </view>
+          <view slot="footer">
+            <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
+          </view>
+        </van-card>
+      </view>
+    </van-tab>
+
+  </van-tabs>
+
+</block>
+<block wx:if="{{selection==4}}">
+  <!--个人主页-->
+  
+  <van-cell title="个人中心" icon="location-o" size="large" />
+  <view class="userinfo">
+    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover" ></image>
+    <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  </view>
+
+  <!--<van-cell title="单元格" is-link url="/pages/dashboard/index" link-type="redirectTo" />-->
+  <view class="user-display">
+    <van-cell icon="envelop-o"  is-link>
+      <view slot="title" wx:if="{{msgNumber>0}}">
+        <view class="van-cell-text">信息中心</view>
+        <van-tag type="danger">有新信息</van-tag>
+      </view>
+      <view slot="title" wx:if="{{msgNumber==0}}">
+        <view class="van-cell-text">信息中心</view>
+      </view>
+    </van-cell>
+    <van-cell icon="user-circle-o" title="个人资料" is-link/>
+    <van-cell icon="chat-o" title="帮助与反馈" is-link/>
+    <van-cell icon="setting-o" title="设置" is-link/>
+    <van-cell icon="paid" title="账户钱包" is-link/>
+  </view>
+  <view class="deleteBut">
+    <van-button size="large" type="danger" >注销</van-button>
+  </view>
+</block>
+
+
+<van-tabbar active="{{ active }}" bind:change="onChange">
+  <van-tabbar-item icon="home-o">接收任务主页</van-tabbar-item>
+  <van-tabbar-item icon="search" >找任务</van-tabbar-item>
+  <van-tabbar-item icon="exchange" >跳至发布任务</van-tabbar-item>
+  <van-tabbar-item icon="balance-list-o" >任务袋</van-tabbar-item>
+  <van-tabbar-item icon="user-o"  wx:if="{{msgNumber>0}}" info="{{msgNumber}}">个人中心</van-tabbar-item>
+  <van-tabbar-item icon="user-o"  wx:if="{{msgNumber==0}}" >个人中心</van-tabbar-item>
+</van-tabbar>

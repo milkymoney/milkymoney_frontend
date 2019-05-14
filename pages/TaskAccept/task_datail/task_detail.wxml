@@ -1,0 +1,43 @@
+<!--pages/task_datail/task_detail.wxml-->
+<van-cell title="接收任务详情"  size="large" icon="description" value="ID:{{taskID}}"/>
+<van-card
+  price="{{taskReward}}"
+  desc="{{taskInfo}}"
+  title="{{taskName}}"
+  thumb="{{ imageURL }}"
+> 
+  <view slot="tags"  padding> 
+    <van-tag type="danger" wx:for="{{tags}}" wx:for-item="taskTag" wx:key="taskID" class="demo-margin-right">{{taskTag}}</van-tag>
+  </view>
+</van-card>
+<van-cell title="你的状态" icon="bookmark-o" />
+<van-steps
+  steps="{{ steps }}"
+  active="{{ active }}"
+  direction="vertical"
+  active-color="#f44"
+/>
+<van-cell title="基本要求" size="large" label="描述信息" />
+<van-cell title="任务介绍" size="large" label="描述信息" />
+<van-cell title="评价细则" size="large" label="描述信息" />
+
+<block wx:if='{{questionnairePath}}'>
+  <view class='questionnaireTask'>
+    <van-button class='navToQue' type="primary" bind:click="navToQuestionnaire">做问卷</van-button>
+
+    <van-button class='navToQue' type="primary" bind:click="uploadImage">上传截图</van-button>
+    <van-cell title="上传截图预览" size="large" label='提交任务前上传截图证明，图片数量不超过三张'/>
+    
+    <!-- 图片缩略图  -->
+    <view class="question-images">
+      <block wx:for="{{images}}" wx:key="*this">
+        <view class="q-image-wrap">
+          <image class="q-image" src="{{item}}" mode="aspectFill" data-idx="{{index}}" bindtap="handleImagePreview"></image>
+          <view class="q-image-remover" data-idx="{{index}}" bindtap="removeImage">删除</view>
+        </view>
+      </block>
+    </view>
+    
+    <van-button class='sub' type="info" bind:click="submitTask">提交任务</van-button>
+  </view>
+</block>
