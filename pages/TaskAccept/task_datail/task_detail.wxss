@@ -1,8 +1,10 @@
 /* pages/task_accept/task_datail/task_detail.wxss */
-.questionnaireTask{
+.questionnaireTask,.errandTask{
   margin-top:40rpx;
   margin-bottom:40rpx; 
 }
+
+
 .navToQue{
   margin-left: 30rpx;
   margin-top: 30rpx;

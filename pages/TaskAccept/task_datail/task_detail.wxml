@@ -21,23 +21,30 @@
 <van-cell title="任务介绍" size="large" label="描述信息" />
 <van-cell title="评价细则" size="large" label="描述信息" />
 
-<block wx:if='{{questionnairePath}}'>
+<!--如果有问卷路径，即任务属性是问卷类型，注意这里没有添加state，需要在后期添加-->
+<block wx:if='{{type=="questionnaire"}}'>
   <view class='questionnaireTask'>
     <van-button class='navToQue' type="primary" bind:click="navToQuestionnaire">做问卷</van-button>
-
-    <van-button class='navToQue' type="primary" bind:click="uploadImage">上传截图</van-button>
-    <van-cell title="上传截图预览" size="large" label='提交任务前上传截图证明，图片数量不超过三张'/>
-    
-    <!-- 图片缩略图  -->
-    <view class="question-images">
-      <block wx:for="{{images}}" wx:key="*this">
-        <view class="q-image-wrap">
-          <image class="q-image" src="{{item}}" mode="aspectFill" data-idx="{{index}}" bindtap="handleImagePreview"></image>
-          <view class="q-image-remover" data-idx="{{index}}" bindtap="removeImage">删除</view>
-        </view>
-      </block>
-    </view>
-    
-    <van-button class='sub' type="info" bind:click="submitTask">提交任务</van-button>
   </view>
 </block>
+
+<block wx:if='{{type=="errand"}}'>
+  <view class='errandTask'>
+    <van-button class='navToQue' type="primary" bind:click="navToErrand">跑腿</van-button>
+  </view>
+</block>
+
+<van-button class='navToQue' type="primary" bind:click="uploadImage">上传截图</van-button>
+<van-cell title="上传截图预览" size="large" label='提交任务前上传截图证明，图片数量不超过三张'/>
+
+<!-- 图片缩略图  -->
+<view class="question-images">
+  <block wx:for="{{images}}" wx:key="*this">
+    <view class="q-image-wrap">
+      <image class="q-image" src="{{item}}" mode="aspectFill" data-idx="{{index}}" bindtap="handleImagePreview"></image>
+      <view class="q-image-remover" data-idx="{{index}}" bindtap="removeImage">删除</view>
+    </view>
+  </block>
+</view>
+
+<van-button class='sub' type="info" bind:click="submitTask">提交任务</van-button>

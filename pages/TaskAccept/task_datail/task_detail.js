@@ -1,8 +1,11 @@
 // pages/taskAccept/task_datail/task_detail.js
 
+//与后端交互请在submitTask函数内调试！！！
+
 //暂时采用以下数据模拟
 
 var states = ['pending', 'doing', 'checking', 'other']
+var types =['questionnaire','errand']
 var task1 = {
   taskReward: 5,
   taskInfo: "地点广州大学城，时间在2.29，先到先得",
@@ -11,7 +14,8 @@ var task1 = {
   tags: ["跑腿", "广州", '待审核'],
   state: states[0],
   taskID: '1',
-  questionnairePath: null
+  questionnairePath: null,
+  type:'errand'
 }
 var task2 = {
   taskReward: 3,
@@ -21,7 +25,8 @@ var task2 = {
   tags: ["问卷", "调查", '待验收'],
   state: states[2],
   taskID: '2',
-  questionnairePath:'pages/wjxqList/wjxqList?activityId=39109067'
+  questionnairePath:'pages/wjxqList/wjxqList?activityId=39109067',
+  type:'questionnaire'
 }
 
 
@@ -36,11 +41,13 @@ Page({
     taskReward:'',
     taskInfo:"",
     taskName:"",
+    //任务的描述图片
     imageURL: "",
     state:'',
     tags:[],
     questionnairePath:null,
-
+    type:'',
+    //任务审核时用户上传的截图
     images: [],
 
     //下面是状态栏的显示
@@ -66,6 +73,19 @@ Page({
   },
 
   /**
+ * 提交问卷，这个是专门与后端进行调试的函数
+ */
+  submitTask() {
+    //getApp().globalData.userInfo 可以获取已经获取的用户信息
+
+    //this.data. 加上属性名字可以获取本页所有的变量，属性见上面的data:{}内部
+
+
+  },
+
+
+
+  /**
    * 跳转到问卷链接,使用问卷星APPID
    */
   navToQuestionnaire(){
@@ -79,6 +99,13 @@ Page({
         // 打开成功
       }
     })
+  },
+
+  /**
+   * 进行跑腿任务，可以加上地图模块
+   */
+  navToErrand(){
+
   },
 
   /**
@@ -124,12 +151,7 @@ Page({
     })
   },
 
-  /**
-   * 提交问卷
-   */
-  submitTask(){
 
-  },
 
   /**
    * 生命周期函数--监听页面加载
@@ -139,7 +161,7 @@ Page({
       taskID: options.taskID
     })
 
-    //暂时用下面的作为效果展示
+    //暂时用下面的作为效果展示，最终需要根据ID从服务端获取
     if(this.data.taskID=='1'){
       this.setData({
         taskReward: task1.taskReward,
@@ -148,7 +170,8 @@ Page({
         imageURL: task1.imageURL,
         tags: task1.tags,
         state:task1.state,
-        questionnairePath:task1.questionnairePath
+        questionnairePath:task1.questionnairePath,
+        type:task1.type
       })
     }else if(this.data.taskID=='2'){
       this.setData({
@@ -158,7 +181,8 @@ Page({
         imageURL: task2.imageURL,
         state: task2.state,
         tags:task2.tags,
-        questionnairePath: task2.questionnairePath
+        questionnairePath: task2.questionnairePath,
+        type: task2.type
       })
     }
 
