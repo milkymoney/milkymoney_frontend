@@ -1,7 +1,28 @@
 /* pages/main/main.wxss */
+.page{
+  margin-bottom: 60px
+}
+
+.bottom{
+  margin-top: 5px
+}
+
 .user-display{
   margin-top: 10px
 }
 .deleteBut{
   margin-top: 100px
+}
+.maxAcceptClass{
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+.rewardClass{
+  margin-left: 20px;
+  margin-top: 5px;
+}
+.submitBut{
+  margin-top: 15px;
+  
 }

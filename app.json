@@ -27,7 +27,12 @@
     "van-picker": "./dist/picker/index",
     "van-tab": "./dist/tab/index",
     "van-tabs": "./dist/tabs/index",
-    "van-steps": "./dist/steps/index"
+    "van-steps": "./dist/steps/index",
+    "van-radio": "./dist/radio/index",
+    "van-radio-group": "./dist/radio-group/index",
+    "van-field": "./dist/field/index",
+    "van-datetime-picker": "./dist/datetime-picker/index",
+    "van-stepper": "./dist/stepper/index"
   },
   "navigateToMiniProgramAppIdList": [
     "wxd947200f82267e58"

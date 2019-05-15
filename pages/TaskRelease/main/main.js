@@ -1,5 +1,6 @@
 // pages/taskRelease/main/main.js
 var states = ['pending', 'doing', 'finished']
+var types = ['questionnaire', 'errand']
 
 var task1 = {
   taskReward: 5,
@@ -47,6 +48,117 @@ Page({
 
     //msgNumber表示个人信息通知数量
     msgNumber: 0,
+
+    //任务类型，0-问卷，1-跑腿
+    taskTypeSelection:0,
+    taskDDL:'',
+    taskReward:0,
+    taskName:'',
+    taskInfo:'',
+    tags:'',
+    taskMaxAccept:0,
+
+    currentDate: new Date().getTime(),
+    show: {
+      middle: false,
+      top: false,
+      bottom: false,
+      right: false,
+      right2: false
+    },
+  },
+
+  
+
+  /**
+   * 底部弹出选择
+   */
+  onTransitionEnd() {
+    //console.log(`You can't see me 🌚`);
+  },
+  toggle(type) {
+    this.setData({
+      [`show.${type}`]: !this.data.show[type],
+      selectedInfo: this.data.areaSelected + " " + this.data.taskTypeSelected + " " + this.data.sortOrderSelected,
+    });
+  },
+  toggleBottomPopup() {
+    this.toggle('bottom');
+  },
+  onCancel() {
+    this.toggleBottomPopup()
+  },
+  onConfirmDDL(event) {
+    const { detail, currentTarget } = event;
+    const date = new Date(detail);
+    const dataStr = date.toLocaleString()
+    this.setData({
+      taskDDL: dataStr
+    })
+    this.toggleBottomPopup()
+  },
+
+
+
+  /**
+   * 选择时间
+   */
+  chooseTime() {
+    this.toggleBottomPopup()
+  },
+
+  /**
+   * 选择参与人数
+   */
+  onChangeMaxAccept(event){
+    this.setData({
+      taskMaxAccept:event.detail
+    })
+    console.log(this.data.taskMaxAccept)
+  },
+
+  /**
+   * 选择人均报酬
+   */
+  onChangeReward(event){
+    this.setData({
+      taskReward:event.detail
+    })
+  },
+
+  /**
+   * 选择发布的任务类型
+   */
+  onClickReleaseTaskType(event){
+    const { value } = event.currentTarget.dataset;
+    this.setData({
+      taskTypeSelection: value
+    });
+  },
+
+  /**
+   * 输入发布任务名
+   */
+  onChangeTaskName({ detail }){
+    this.setData({
+      taskName:detail
+    })
+  },
+
+  /**
+   * 输入任务描述
+   */
+  onChangeTaskInfo({ detail }) {
+    this.setData({
+      taskInfo:detail
+    })
+  },
+
+  /**
+   * 
+   */
+  submitTask(){
+    console.log('提交审核')
   },
 
   /**

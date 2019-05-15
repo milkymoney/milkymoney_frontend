@@ -79,7 +79,7 @@ Page({
     //getApp().globalData.userInfo 可以获取已经获取的用户信息
 
     //this.data. 加上属性名字可以获取本页所有的变量，属性见上面的data:{}内部
-
+    
 
   },
 
