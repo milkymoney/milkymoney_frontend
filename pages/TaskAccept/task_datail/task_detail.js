@@ -1,8 +1,10 @@
 // pages/taskAccept/task_datail/task_detail.js
+import Toast from '../../../dist/toast/toast';
 
 //与后端交互请在submitTask函数内调试！！！
 
 //暂时采用以下数据模拟
+
 
 var states = ['pending', 'doing', 'checking', 'other']
 var types =['questionnaire','errand']
@@ -22,8 +24,8 @@ var task2 = {
   taskInfo: "调查问卷，关于奶牛APP的用户体验调查",
   taskName: "问卷任务",
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
-  tags: ["问卷", "调查", '待验收'],
-  state: states[2],
+  tags: ["问卷", "调查", '待完成'],
+  state: states[1],
   taskID: '2',
   questionnairePath:'pages/wjxqList/wjxqList?activityId=39109067',
   type:'questionnaire'
@@ -73,8 +75,8 @@ Page({
   },
 
   /**
- * 提交问卷，这个是专门与后端进行调试的函数
- */
+   * 提交问卷，这个是专门与后端进行调试的函数
+   */
   submitTask() {
     //getApp().globalData.userInfo 可以获取已经获取的用户信息
 
@@ -83,6 +85,12 @@ Page({
 
   },
 
+  /**
+   * 报名活动
+   */
+  signUpTask(){
+
+  },
 
 
   /**

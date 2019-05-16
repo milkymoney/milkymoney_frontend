@@ -4,6 +4,11 @@
   margin-bottom:40rpx; 
 }
 
+.but{
+  margin-top:40rpx;
+  margin-bottom:40rpx; 
+  margin-left: 30rpx;
+}
 
 .navToQue{
   margin-left: 30rpx;

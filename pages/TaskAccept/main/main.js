@@ -15,8 +15,8 @@ var task2 = {
   taskInfo: "调查问卷，关于奶牛APP的用户体验调查",
   taskName: "问卷任务",
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
-  tags: ["问卷", "调查",'待验收'],
-  state:states[2],
+  tags: ["问卷", "调查",'待完成'],
+  state:states[1],
   taskID:'2'
 }
 
