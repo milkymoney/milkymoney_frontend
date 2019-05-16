@@ -1,4 +1,7 @@
 // pages/taskRelease/main/main.js
+
+//submit task函数可用于后台调试
+
 var states = ['pending', 'doing', 'finished']
 var types = ['questionnaire', 'errand']
 
@@ -50,7 +53,7 @@ Page({
     msgNumber: 0,
 
     //任务类型，0-问卷，1-跑腿
-    taskTypeSelection:0,
+    taskTypeSelection:'0',
     taskDDL:'',
     taskReward:0,
     taskName:'',
@@ -98,7 +101,13 @@ Page({
     this.toggleBottomPopup()
   },
 
-
+  /**
+   * 提交审核，这里也可调试
+   */
+  submitTask() {
+    
+    console.log('提交审核')
+  },
 
   /**
    * 选择时间
@@ -155,11 +164,17 @@ Page({
   },
 
   /**
-   * 
+   * 输入任务标签
    */
-  submitTask(){
-    console.log('提交审核')
+  onChangeTaskTags({ detail }) {
+    this.setData({
+      tags: detail
+    })
   },
+
+
+
+
 
   /**
    * 底部页面选择
@@ -265,6 +280,8 @@ Page({
     taskListPre.push(task2)
 
     this.setData({
+      
+      
       taskList: taskListPre,
       userInfo: getApp().globalData.userInfo,
       myPendingTasks: [],
@@ -281,7 +298,7 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
+    
   },
 
   /**

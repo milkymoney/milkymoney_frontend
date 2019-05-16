@@ -50,6 +50,14 @@
         required
         bind:change="onChangeTaskInfo"
     />
+    <van-field
+        value="{{ tags }}"
+        label="任务标签"
+        placeholder="空格分隔标签"
+        clearable
+        size="large"
+        bind:change="onChangeTaskTags"
+    />
 
     <van-cell title="任务截至时间" size='large' icon='clock-o'/>
     <van-cell title="点击选择时间(年月日时分)"  value="{{taskDDL}}" bind:click='chooseTime'/>
