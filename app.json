@@ -35,7 +35,8 @@
     "van-stepper": "./dist/stepper/index",
     "van-toast": "./dist/toast/index",
     "van-checkbox": "./dist/checkbox/index",
-    "van-checkbox-group": "./dist/checkbox-group/index"
+    "van-checkbox-group": "./dist/checkbox-group/index",
+    "van-dialog": "./dist/dialog/index"
   },
   "navigateToMiniProgramAppIdList": [
     "wxd947200f82267e58"

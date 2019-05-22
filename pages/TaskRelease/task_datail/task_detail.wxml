@@ -121,3 +121,25 @@
 <block wx:if='{{state=="finished"}}'>
   <van-button type="info" class='but'>任务已结束</van-button>
 </block>
+
+<van-dialog
+    use-slot
+    async-close
+    show="{{ showDialog }}"
+    show-cancel-button
+    title="{{titleDialog}}"
+    message="{{msgDialog}}"
+    transition="fade"
+    bind:close="onCloseDialog"
+    confirm-button-open-type="getUserInfo"
+    bind:getuserinfo="getUserInfo"
+  >
+    <van-field
+      value="{{ password }}"
+      type="password"
+      label="密码"
+      border="{{ false }}"
+      placeholder="请输入支付密码"
+      bind:change="onChangePassword"
+    />
+  </van-dialog>

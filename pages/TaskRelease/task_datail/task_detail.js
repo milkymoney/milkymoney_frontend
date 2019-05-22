@@ -1,5 +1,7 @@
 // pages/task_datail/task_detail.js
 
+import Dialog from '../../../dist/dialog/dialog';
+
 var states = ['pending', 'doing', 'finished']
 
 var checkState=['unchecked','passed','unpassed']
@@ -110,8 +112,55 @@ Page({
 
     //下面的用于显示复选框
     isPass:[],
-    isUnPass:[]
+    isUnPass:[],
 
+    //支付的对话框
+    showDialog: false,
+    password: '',
+    titleDialog:'您需要支付xx元'
+  },
+
+  /**
+   * 支付窗口点击确认按钮时，会返回获取到的用户信息
+   */
+  getUserInfo(event) {
+    //console.log(event.detail);
+  },
+
+  /**
+   * 开启支付对话框
+   */
+  showCustomDialog() {
+    this.setData({ showDialog: true });
+  },
+
+  /**
+   * 输入密码 
+   */
+  onChangePassword(event){
+    //console.log(event.detail)
+  },
+
+  /**
+   * 关闭支付的对话窗口
+   */
+  onCloseDialog(event) {
+    if (event.detail === 'confirm') {
+      setTimeout(() => {
+        this.setData({
+          showDialog: false
+        });
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success',
+        })
+       
+      }, 1000);
+    } else {
+      this.setData({
+        showDialog: false
+      });
+    }
   },
 
 
@@ -201,9 +250,27 @@ Page({
    * 提交验收评价
    */
   submitChecked(){
-    //对于checkState为'checked'即已经验收过的，切记不要上传覆盖
-    
+    //支付
+    this.showCustomDialog()
+
     console.log('验收提交')
+
+    let usersDataTemp=this.data.usersData
+    //提交之后刷新页面
+    for (let i = 0; i < usersDataTemp.length;i++){
+      //对之前未验收的进行验收
+      if (usersDataTemp[i].state == checkState[0]){
+          if(this.data.isPass[i]){
+            usersDataTemp[i].state = checkState[1]
+          }else if(this.data.isUnPass[i]){
+            usersDataTemp[i].state = checkState[2]
+          }
+      }
+    }
+
+    this.setData({
+      usersData:usersDataTemp
+    })
   },
 
   /**
