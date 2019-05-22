@@ -242,6 +242,8 @@
       <van-button size="large" type="danger" >注销</van-button>
     </view>
   </block>
+
+  <view class="bottom-view"/>
 </view>
 
 <van-tabbar active="{{ active }}" bind:change="onChange">

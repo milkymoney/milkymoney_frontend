@@ -33,7 +33,9 @@
     "van-field": "./dist/field/index",
     "van-datetime-picker": "./dist/datetime-picker/index",
     "van-stepper": "./dist/stepper/index",
-    "van-toast": "./dist/toast/index"
+    "van-toast": "./dist/toast/index",
+    "van-checkbox": "./dist/checkbox/index",
+    "van-checkbox-group": "./dist/checkbox-group/index"
   },
   "navigateToMiniProgramAppIdList": [
     "wxd947200f82267e58"

@@ -1,5 +1,123 @@
 <!--pages/task_datail/task_detail.wxml-->
-<text>pages/task_datail/task_detail.wxml:{{itemID}}</text>
-<block>
-  这是任务详情界面
+<van-cell   
+  title="发布任务详情"  
+  size="large" 
+  icon="description" 
+  value="ID:{{taskID}}"/>
+<van-card
+  price="{{taskReward}}"
+  desc="{{taskInfo}}"
+  title="{{taskName}}"
+  thumb="{{ imageURL }}"
+> 
+  <view slot="tags"  padding> 
+    <van-tag type="danger" 
+      wx:for="{{tags}}" 
+      wx:for-item="taskTag" 
+      wx:key="taskID" 
+      class="demo-margin-right">
+      {{taskTag}}
+    </van-tag>
+  </view>
+</van-card>
+<van-cell title="你的状态" icon="bookmark-o" />
+<van-steps
+  steps="{{ steps }}"
+  active="{{ active }}"
+  direction="vertical"
+  active-color="#f44"
+/>
+<van-cell title="基本要求" size="large" label="描述信息" />
+<van-cell title="任务介绍" size="large" label="描述信息" />
+<van-cell title="评价细则" size="large" label="描述信息" />
+
+<van-button type="warning" class='but'>修改您的任务</van-button>
+
+<block wx:if='{{state=="pending"}}'>
+  <van-button type="info" class='but'>已完成发布信息，审核中</van-button>
+</block>
+
+<block wx:if='{{state=="doing"}}'>
+  <van-cell 
+    title="审核用户" 
+    size="large" 
+    label="审核下列用户的提交是否符合您的要求" />
+  
+  <view wx:for="{{usersData}}" wx:key="index">
+    
+    <block wx:if="{{item.state=='unchecked'}}">
+      <van-cell title="用户ID：{{item.userID}}" >
+        <view class='cell-right'>
+          <view class='cell-right-check'>
+            <van-checkbox  
+              value="{{ isUnPass[index] }}" 
+              data-userid="{{item.userID}}" 
+              data-checkType="unPassed"
+              data-idx="{{index}}"
+              bind:change="onChangeChecked" 
+              checked-color="#FF0000">
+              <view  class='unPassed'>
+                不通过
+              </view>
+            </van-checkbox>
+          </view>
+          <view class='cell-right-check'>
+            <van-checkbox 
+              value="{{isPass[index]}}" 
+              data-userid="{{item.userID}}"  
+              data-checkType="passed"
+              data-idx="{{index}}"
+              bind:change="onChangeChecked">
+                通过
+            </van-checkbox>
+          </view>
+        </view>
+
+      </van-cell>
+    </block>
+    <block wx:if="{{item.state=='passed'}}">
+      <van-cell title="用户ID：{{item.userID}}"  value="已审核通过" />
+    </block>
+    <block wx:if="{{item.state=='unpassed'}}">
+      <van-cell title="用户ID：{{item.userID}}"  value="已审核未通过" />
+    </block>
+
+  <!-- 图片缩略图  -->
+  <view class="question-images">
+    <block wx:for="{{item.imagesURL}}" wx:key="*this">
+      <view class="q-image-wrap">
+        <image 
+          class="q-image" 
+          src="{{item}}" 
+          mode="aspectFill" 
+          data-url="{{item}}" 
+          bindtap="handleImagePreview">
+        </image>
+      </view>
+    </block>
+  </view>
+
+  </view>
+  
+  <view  class='check-all'>
+    <van-checkbox 
+      value="{{ checked_all }}" 
+      bind:change="onChangeCheckedAll">
+      全选通过
+    </van-checkbox>
+  </view>
+  <view class='sub'>
+    <view class='subBut'>
+      <van-button 
+        type="info" 
+        bind:click='submitChecked'>
+        提交验收记录
+      </van-button>
+    </view>
+  </view>
+
+</block>
+
+<block wx:if='{{state=="finished"}}'>
+  <van-button type="info" class='but'>任务已结束</van-button>
 </block>

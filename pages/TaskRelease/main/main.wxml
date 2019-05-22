@@ -88,8 +88,7 @@
     <view class='submitBut'>
       <van-button size="large" type="primary" bind:click='submitTask' >提交审核</van-button>
     </view>
-    <van-cell title="" size='large'/>
-    <van-cell title="" size='large'/>
+  
   </block>
 
   <block wx:if="{{selection==3}}">
@@ -188,6 +187,8 @@
       <van-button size="large" type="danger" >注销</van-button>
     </view>
   </block>
+
+  <view class="bottom-view"/>
 </view>
 
 <view class='bottom'>

@@ -1,5 +1,6 @@
 // pages/taskRelease/main/main.js
 
+
 //submit task函数可用于后台调试
 
 var states = ['pending', 'doing', 'finished']
@@ -11,7 +12,8 @@ var task1 = {
   taskName: "跑腿任务",
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
   tags: ["跑腿", "广州", '进行中'],
-  state: states[1]
+  state: states[1],
+  taskID: '1'
 }
 var task2 = {
   taskReward: 3,
@@ -19,7 +21,8 @@ var task2 = {
   taskName: "问卷任务",
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
   tags: ["问卷", "调查", '进行中'],
-  state: states[1]
+  state: states[1],
+  taskID: '2'
 }
 
 
@@ -52,7 +55,7 @@ Page({
     //msgNumber表示个人信息通知数量
     msgNumber: 0,
 
-    //任务类型，0-问卷，1-跑腿
+    //发布的任务类型，0-问卷，1-跑腿
     taskTypeSelection:'0',
     taskDDL:'',
     taskReward:0,
@@ -60,6 +63,10 @@ Page({
     taskInfo:'',
     tags:'',
     taskMaxAccept:0,
+
+
+    //底部图标
+    active:0,
 
     currentDate: new Date().getTime(),
     show: {
@@ -103,10 +110,36 @@ Page({
 
   /**
    * 提交审核，这里也可调试
+   * 
+   * 提交之后跳转到已发布任务界面，发布者可以查看自己发布的任务情况
    */
   submitTask() {
+    wx.showToast({
+      title: '您的任务已发布成功',
+      icon: 'success',
+      duration: 2000,
+      success:()=>{
+        //跳转界面
+        this.setData({
+          selection: 3,
+          active:3
+        });
+      }
+    })
     
+
     console.log('提交审核')
+  },
+
+  /**
+   * 跳转到任务详情界面
+   */
+
+  navToTaskDetail(event){
+    //console.log(event.target)
+    wx.navigateTo({
+      url: '../task_datail/task_detail?taskID=' + event.target.id,
+    })
   },
 
   /**
@@ -181,7 +214,8 @@ Page({
    */
   onChange: function(event) {
     this.setData({
-      selection:event.detail
+      selection:event.detail,
+      active: event.detail
     });
 
     //跳转到接受任务界面
