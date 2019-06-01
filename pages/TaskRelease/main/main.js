@@ -309,6 +309,24 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    //处理修改任务的跳转
+    if (options.info) {
+      let info=JSON.parse(options.info)
+      this.setData({
+        taskTypeSelection: info.taskTypeSelection,
+        taskDDL: info.taskDDL,
+        taskReward: info.taskReward,
+        taskName: info.taskName,
+        taskInfo: info.taskInfo,
+        tags: info.tags,
+        taskMaxAccept: info.taskMaxAccept,
+        selection: 1,
+        active: 1
+      })
+
+    }
+
+    
     let taskListPre = this.data.taskList
     taskListPre.push(task1)
     taskListPre.push(task2)
@@ -339,7 +357,8 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    
+    
   },
 
   /**

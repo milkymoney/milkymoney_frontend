@@ -17,6 +17,9 @@ var task1 = {
   tags: ["跑腿", "广州", '进行中'],
   state: states[1],
   taskID: '1',
+  taskTypeSelection: '1',
+  taskDDL: '2019/10/1 下午10:00:00',
+  taskMaxAccept: 5,
   type: 'errand'
 }
 var task2 = {
@@ -27,6 +30,9 @@ var task2 = {
   tags: ["问卷", "调查", '进行中'],
   state: states[1],
   taskID: '2',
+  taskTypeSelection: '0',
+  taskDDL: '2019/7/1 上午8:00:00',
+  taskMaxAccept: 15,
   type: 'questionnaire'
 }
 
@@ -67,6 +73,9 @@ Page({
   data: {
     taskID: '',
     taskReward: '',
+    taskTypeSelection:'',
+    taskDDL: '',
+    taskMaxAccept: 10,
     taskInfo: "",
     taskName: "",
     //任务的描述图片
@@ -132,6 +141,25 @@ Page({
    */
   showCustomDialog() {
     this.setData({ showDialog: true });
+  },
+
+  /**
+   * 
+   */
+  changeTask(){
+    let info = {
+      taskTypeSelection: this.data.taskTypeSelection,
+      taskDDL: this.data.taskDDL,
+      taskReward: this.data.taskReward,
+      taskName: this.data.taskName,
+      taskInfo: this.data.taskInfo,
+      tags: this.data.tags,
+      taskMaxAccept: this.data.taskMaxAccept,
+      
+    }
+    wx.redirectTo({
+      url: '../../TaskRelease/main/main?info=' + JSON.stringify(info),
+    })
   },
 
   /**
@@ -327,7 +355,10 @@ Page({
         imageURL: task1.imageURL,
         tags: task1.tags,
         state: task1.state,
-        type: task1.type
+        type: task1.type,
+        taskTypeSelection: task1.taskTypeSelection,
+        taskDDL: task1.taskDDL,
+        taskMaxAccept: task1.taskMaxAccept,
       })
     } else if (this.data.taskID == '2') {
       this.setData({
@@ -337,7 +368,10 @@ Page({
         imageURL: task2.imageURL,
         state: task2.state,
         tags: task2.tags,
-        type: task2.type
+        type: task2.type,
+        taskTypeSelection: task2.taskTypeSelection,
+        taskDDL: task2.taskDDL,
+        taskMaxAccept: task2.taskMaxAccept,
       })
     }
 

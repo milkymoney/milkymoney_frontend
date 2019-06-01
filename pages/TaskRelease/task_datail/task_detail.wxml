@@ -31,7 +31,7 @@
 <van-cell title="任务介绍" size="large" label="描述信息" />
 <van-cell title="评价细则" size="large" label="描述信息" />
 
-<van-button type="warning" class='but'>修改您的任务</van-button>
+<van-button type="warning" class='but' bind:click="changeTask">修改您的任务</van-button>
 
 <block wx:if='{{state=="pending"}}'>
   <van-button type="info" class='but'>已完成发布信息，审核中</van-button>
