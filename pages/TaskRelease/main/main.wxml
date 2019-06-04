@@ -1,4 +1,4 @@
-<!--pages/main/main.wxml-->
+<!--pages/TaskRelease/main/main.wxml-->
 <view class='page'>
 
   <block wx:if="{{selection==0}}">

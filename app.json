@@ -11,7 +11,8 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true
   },
   "usingComponents": {
     "van-tabbar": "./dist/tabbar/index",
@@ -42,4 +43,5 @@
     "wxd947200f82267e58"
   ],
   "sitemapLocation": "sitemap.json"
+  
 }

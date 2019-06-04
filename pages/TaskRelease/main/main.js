@@ -39,7 +39,9 @@ Page({
       3：任务
       4：账户
     */
-    selection:0,
+    selection:3,
+    //底部图标
+    active: 3,
 
     //搜索框输入
     search_value:'',
@@ -65,8 +67,7 @@ Page({
     taskMaxAccept:0,
 
 
-    //底部图标
-    active:0,
+    
 
     currentDate: new Date().getTime(),
     show: {
@@ -377,9 +378,23 @@ Page({
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
+   * 用户下拉，进行刷新
    */
   onPullDownRefresh: function () {
+    
+    //当用户在已发布的任务界面时  
+    //下拉，刷新用户的已发布列表
+    if (this.data.selection==3){
+      //在标题栏中显示加载
+      wx.showNavigationBarLoading()
 
+      //这里增加刷新函数
+
+      //加载完成
+      wx.hideNavigationBarLoading()
+      wx.stopPullDownRefresh()
+    }
+    
   },
 
   /**

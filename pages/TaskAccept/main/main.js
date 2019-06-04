@@ -348,7 +348,21 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
+    //在标题栏中显示加载
+    wx.showNavigationBarLoading()
 
+    //这里增加刷新函数
+    if(this.data.selection==0||this.data.selection==1){
+      //下拉刷新所有的可见已发布任务
+
+    }else if(this.data.selection==3){
+      //下拉刷新自己的任务袋
+
+    }
+
+    //加载完成
+    wx.hideNavigationBarLoading()
+    wx.stopPullDownRefresh()
   },
 
   /**
