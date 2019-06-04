@@ -115,8 +115,25 @@ Page({
    * 提交之后跳转到已发布任务界面，发布者可以查看自己发布的任务情况
    */
   submitTask() {
+    /////////////////////////
+    //
+    //这里可以发布新任务，也是修改任务的地方
+    //可用的变量：使用例子：this.data.taskTypeSelection
+    //taskTypeSelection:'0',
+    //taskDDL:'',
+    //taskReward:0,
+    //taskName:'',
+    //taskInfo:'',
+    //tags:'',
+    //taskMaxAccept:0,
+    //
+    /////////////////////////
+
+    
+    
+    //完成发布或者修改
     wx.showToast({
-      title: '您的任务已发布成功',
+      title: '已发布成功/修改',
       icon: 'success',
       duration: 2000,
       success:()=>{
@@ -308,6 +325,7 @@ Page({
 
   /**
    * 生命周期函数--监听页面加载
+   * 将获取到的任务装入taskListPre
    */
   onLoad: function (options) {
     //处理修改任务的跳转
@@ -329,12 +347,15 @@ Page({
 
     
     let taskListPre = this.data.taskList
+    ///////////////////////////////////////
+    //
+    //将获取到的任务装入taskListPre
+    //
+    ////////////////////////////////////////
     taskListPre.push(task1)
     taskListPre.push(task2)
 
     this.setData({
-      
-      
       taskList: taskListPre,
       userInfo: getApp().globalData.userInfo,
       myPendingTasks: [],
@@ -389,6 +410,25 @@ Page({
       wx.showNavigationBarLoading()
 
       //这里增加刷新函数
+      let taskList=[]
+
+      ///////////////////////////
+      //
+      //将获取到的push到taskList
+      //
+      ///////////////////////////
+      
+      
+      this.setData({
+        taskList: taskList,
+        myPendingTasks: [],
+        myDoingTasks: [],
+        myFinishedTasks: [],
+      })
+
+      this.preparePendingTasks()
+      this.prepareDoingTasks()
+      this.prepareCheckingTasks()
 
       //加载完成
       wx.hideNavigationBarLoading()

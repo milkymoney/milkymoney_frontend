@@ -137,6 +137,13 @@ Page({
   },
 
   /**
+   * 删除当前任务
+   */
+  deleteTask(){
+    //this.data.taskID是string格式，请自己转换成integer
+  },
+
+  /**
    * 开启支付对话框
    */
   showCustomDialog() {
@@ -226,6 +233,7 @@ Page({
       this.setData({
         isUnPass: isUnPassTemp,
         isPass: isPassTemp,
+        checked_all:0
       })
     }
 
@@ -283,6 +291,7 @@ Page({
 
     console.log('验收提交')
 
+
     let usersDataTemp=this.data.usersData
     //提交之后刷新页面
     for (let i = 0; i < usersDataTemp.length;i++){
@@ -296,6 +305,16 @@ Page({
       }
     }
 
+    ////////////////////////////////
+    //
+    //验收的提交内容为usersDataTemp,
+    //usersDataTemp是一个列表，单个的数据结构为 
+    //{  userID: 用户ID,
+    //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
+    // }
+    //
+    ////////////////////////////////
+
     this.setData({
       usersData:usersDataTemp
     })
@@ -307,6 +326,12 @@ Page({
   onLoad: function (options) {
     //console.log(options)
 
+    //////////////////////////////
+    //
+    //这里需要根据taskID获取对应的信息
+    //将获取到的待验收信息push进usersDataTemp
+    //
+    ///////////////////////////////////
 
     //下面的数据都是暂时代替服务器的
     let usersDataTemp=[]
@@ -314,22 +339,15 @@ Page({
     usersDataTemp.push(user2_data)
     usersDataTemp.push(user3_data)
 
+    //这个是用于存储验收状态的
     let checkTemp=[]
-    let check1={
-      userID:user1_data.userID,
-      checkState:user1_data.state
+    for (let i = 0; i < usersDataTemp.length;i++){
+      let check={
+        userID:usersDataTemp[i],
+        checkState:usersDataTemp[i]
+      }
+      checkTemp.push(check)
     }
-    let check2 = {
-      userID: user2_data.userID,
-      checkState: user2_data.state
-    }
-    let check3 = {
-      userID: user3_data.userID,
-      checkState: user3_data.state
-    }
-    checkTemp.push(check1)
-    checkTemp.push(check2)
-    checkTemp.push(check3)
 
     let isPassedTemp = new Array(checkTemp.length)
     let isUnpassedTemp=new Array(checkTemp.length)
@@ -346,6 +364,12 @@ Page({
       isPass:isPassedTemp,
       isUnPass:isUnpassedTemp
     })
+
+    /////////////////////////
+    //
+    //根据taskID获取本页面的任务内容（不包括验收内容）
+    //
+    /////////////////////////
 
     if (this.data.taskID == '1') {
       this.setData({

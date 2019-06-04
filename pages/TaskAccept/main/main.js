@@ -6,8 +6,8 @@ var task1 = {
   taskInfo: "地点广州大学城，时间在2.29，先到先得",
   taskName: "跑腿任务",
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-  tags: ["跑腿", "广州",'待审核'],
-  state:states[0],
+  tags: ["跑腿", "广州",'待验收'],
+  state:states[2],
   taskID:'1'
 }
 var task2 = {
@@ -294,9 +294,17 @@ Page({
 
   /**
    * 生命周期函数--监听页面加载
+   * 将获取到的任务push进taskListPre
    */
   onLoad: function (options) {
     let taskListPre = this.data.taskList
+    
+    //////////////////////////
+    //
+    //将获取到的任务push进taskListPre
+    //
+    ////////////////////////////
+
     taskListPre.push(task1)
     taskListPre.push(task2)
 
@@ -354,9 +362,33 @@ Page({
     //这里增加刷新函数
     if(this.data.selection==0||this.data.selection==1){
       //下拉刷新所有的可见已发布任务
+      let _taskList=[]
+
+      ////////////////////////
+      //
+      //将获取到的所有已发布任务装入_taskList
+      //
+      //////////////////////////
+
+      this.setData({
+        taskList: _taskList
+      })
+
 
     }else if(this.data.selection==3){
-      //下拉刷新自己的任务袋
+      //下拉刷新自己已接受的任务袋
+      let _myTasks=[]
+
+      //////////////////////////
+      //
+      //将获取到的自己接收到的放入_myTasks
+      //
+      //////////////////////////
+
+
+      this.setData({
+        myTasks: _myTasks
+      })
 
     }
 
