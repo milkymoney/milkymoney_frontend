@@ -168,6 +168,12 @@ Page({
     this.setData({
       taskID: options.taskID
     })
+    ///////////////////////////////
+    //
+    //这里根据this.data.taskID获取对应的任务内容
+    //
+    ///////////////////////////////
+
 
     //暂时用下面的作为效果展示，最终需要根据ID从服务端获取
     if(this.data.taskID=='1'){
@@ -257,7 +263,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
+    wx.stopPullDownRefresh()
   },
 
   /**
