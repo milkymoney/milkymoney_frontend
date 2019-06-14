@@ -15,7 +15,7 @@
       bind:search="onSearchMain"
       shape="round"
     >
-      <view slot="action" bind:tap="onSearch">搜索</view>
+      <view slot="action" bind:tap="onSearchMain">搜索</view>
     </van-search>
     
     <van-cell title="推荐任务"  size="large" />
@@ -49,7 +49,7 @@
       bind:search="onSearchMain"
       shape="round"
     >
-      <view slot="action" bind:tap="onSearch">搜索</view>
+      <view slot="action" bind:tap="onSearchMain">搜索</view>
     </van-search>
     <!--按筛选要求显示任务-->
 

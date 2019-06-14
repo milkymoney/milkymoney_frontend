@@ -25,7 +25,6 @@ var task2 = {
   taskID: '2'
 }
 
-
 Page({
 
   /**
@@ -127,9 +126,64 @@ Page({
     //tags:'',
     //taskMaxAccept:0,
     //
-    /////////////////////////
 
-    
+    // if (!isModifyTask) {
+      console.log('POST /task/publisher')
+      console.log(this.data)
+      wx.request({
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher?userId=2',
+        method: 'POST',
+        header: {
+          'accept': 'application/json',
+          'content-type': 'application/json'
+        },
+        body: {
+          'type': types[Number(this.data.taskTypeSelection)],
+          'description': this.data.taskInfo,
+          'reward': this.data.taskReward,
+          'deadline': this.data.taskDDL,
+          'label': this.data.tags,
+          'state': states[0], // pending
+          'priority': 0,
+          'maxAccept': this.data.taskMaxAccept,
+          'hasAccept': 0,
+          'publisher': getApp().globalData.userInfo['nickName']
+        },
+        success(res) {
+          console.log(res)
+        }
+      })
+    // } else {
+      
+      // console.log('PUT /task/publisher{taskId}')
+      // console.log(this.data)
+      // wx.request({
+      //   // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
+      //   url: 'https://www.wtysysu.cn:10443/v1/task/publisher/5?userId=2',
+      //   method: 'PUT',
+      //   header: {
+      //     'accept': 'application/json',
+      //     'content-type': 'application/json'
+      //   },
+      //   body: {
+      //     'tid': Number(this.data.taskID),
+      //     'type': types[Number(this.data.taskTypeSelection)],
+      //     'description': this.data.taskInfo,
+      //     'reward': this.data.taskReward,
+      //     'deadline': this.data.taskDDL,
+      //     'labels': this.data.tags,
+      //     // 'state': this.data.state, // pending
+      //     'priority': 0,
+      //     'maxAccept': this.data.taskMaxAccept,
+      //     // 'hasAccept': this.data.hasAccept,
+      //     'publisher': getApp().globalData.userInfo['nickName']
+      //   },
+      //   success(res) {
+      //     console.log(res)
+      //   }
+      // })
+    // }
+    /////////////////////////
     
     //完成发布或者修改
     wx.showToast({
@@ -351,6 +405,23 @@ Page({
     //
     //将获取到的任务装入taskListPre
     //
+    console.log('GET /task/publisher')
+    wx.request({
+      // pageid: integer, keyword: string
+      url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
+      method: 'GET',
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+        console.log(res.data.length)
+        res.data.forEach(function (atask) {
+          taskListPre.push(atask)
+        })
+      }
+    })
+    //
     ////////////////////////////////////////
     taskListPre.push(task1)
     taskListPre.push(task2)
@@ -416,6 +487,23 @@ Page({
       //
       //将获取到的push到taskList
       //
+      console.log('GET /task/publisher')
+      console.log('search_value: ' + this.data.search_value)
+      wx.request({
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
+        method: 'GET',
+        header: {
+          'accept': 'application/json',
+        },
+        success(res) {
+          console.log(res)
+          console.log(res.data.length)
+          res.data.forEach(function (atask) {
+            taskList.push(atask)
+          })
+        }
+      })
+      // 
       ///////////////////////////
       
       

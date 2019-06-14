@@ -20,7 +20,6 @@ var task2 = {
   taskID:'2'
 }
 
-
 Page({
 
   /**
@@ -297,31 +296,66 @@ Page({
    * 将获取到的任务push进taskListPre
    */
   onLoad: function (options) {
+
     let taskListPre = this.data.taskList
-    
+
     //////////////////////////
     //
     //将获取到的任务push进taskListPre
     //
-    ////////////////////////////
-
-    taskListPre.push(task1)
-    taskListPre.push(task2)
-
-    this.setData({
-      taskList: taskListPre,
-      userInfo: getApp().globalData.userInfo,
-      myTasks: taskListPre,
-      myPendingTasks: [],
-      myDoingTasks: [],
-      myCheckingTasks: [],
-      myOtherTasks: []
+    let taskPromise = new Promise((resolve, reject) => {
+      console.log('GET /task')
+      console.log('search main value: ' + this.data.search_value_main)
+      wx.request({
+        url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+        method: 'GET',
+        header: {
+          'accept': 'application/json'
+        },
+        success(res) {
+          console.log(res)
+          console.log(res.data.length)
+          res.data.forEach(function (atask) {
+            let taskTag = atask.label.split(" ")
+            let _atask = {
+              taskReward: atask.reward,
+              taskInfo: atask.description,
+              taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
+              imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+              tags: taskTag,
+              state: states[3],
+              taskID: atask.id
+            }
+            taskListPre.push(_atask)
+          })
+          resolve('ok')
+        }
+      })
     })
+    // 
+    //
+    ////////////////////////////
+    
+    taskPromise.then((resolve) =>{
+      taskListPre.push(task1)
+      taskListPre.push(task2)
 
-    this.preparePendingTasks()
-    this.prepareDoingTasks()
-    this.prepareCheckingTasks()
-    this.prepareOtherTasks()
+      this.setData({
+        taskList: taskListPre,
+        userInfo: getApp().globalData.userInfo,
+        myTasks: taskListPre,
+        myPendingTasks: [],
+        myDoingTasks: [],
+        myCheckingTasks: [],
+        myOtherTasks: []
+      })
+
+      this.preparePendingTasks()
+      this.prepareDoingTasks()
+      this.prepareCheckingTasks()
+      this.prepareOtherTasks()
+    })
+    
   },
 
   /**
@@ -368,11 +402,48 @@ Page({
       //
       //将获取到的所有已发布任务装入_taskList
       //
+
+      let taskPromise=new Promise( (resolve,reject)=>{
+        console.log('GET /task')
+        console.log('search main value: ' + this.data.search_value_main)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            console.log(res)
+            console.log(res.data.length)
+            res.data.forEach(function (atask) {
+              let taskTag = atask.label.split(" ")
+              let _atask = {
+                taskReward: atask.reward,
+                taskInfo: atask.description,
+                taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
+                imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                tags: taskTag,
+                state: states[3],
+                taskID: atask.id
+              }
+              _taskList.push(_atask)
+            })
+            resolve('ok')
+          }
+        })
+      } )
+      
+      //
       //////////////////////////
 
-      this.setData({
-        taskList: _taskList
-      })
+      taskPromise.then( (resolve)=>{
+        _taskList.push(task1)
+        _taskList.push(task2)
+        this.setData({
+          taskList: _taskList
+        })
+      } )
+      
 
 
     }else if(this.data.selection==3){
@@ -383,12 +454,36 @@ Page({
       //
       //将获取到的自己接收到的放入_myTasks
       //
-      //////////////////////////
 
-
-      this.setData({
-        myTasks: _myTasks
+      let taskPromise=new Promise((resolve,reject)=>{
+        console.log('GET /task/recipient')
+        console.log('search value personal: ' + this.data.search_value_personal)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page=0&keyword=' + this.data.search_value_personal + '&userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            console.log(res)
+            console.log(res.data.length)
+            res.data.forEach(function (atask) {
+              _myTasks.push(atask)
+            })
+            resolve('ok')
+          }
+        })
       })
+      
+      //
+      //////////////////////////
+      taskPromise.then( (resolve)=>{
+        this.setData({
+          myTasks: _myTasks
+        })
+      } )
+
+      
 
     }
 

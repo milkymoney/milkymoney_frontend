@@ -82,14 +82,52 @@ Page({
 
     //this.data. 加上属性名字可以获取本页所有的变量，属性见上面的data:{}内部
     
-
+    /////////////////////////////////////////
+    //
+    //接受者结算任务
+    //
+    console.log(this.data.images)
+    console.log('POST /task/recipient/settleup/{taskId}')
+    wx.uploadFile({
+      // url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID + '?userId=2',
+      url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/1?userId=2',
+      filePath: this.data.images[0],
+      name: 'proveImages',
+      formData: {
+        user: 2
+      },
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+      }
+    })
+    //
+    /////////////////////////////////////////
   },
 
   /**
    * 报名活动
    */
   signUpTask(){
-
+    //////////////////////////////////////
+    //
+    //接受任务
+    console.log('POST /task/recipient/{taskId}')
+    wx.request({
+      // url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + this.data.taskID + '?userId=2',
+      url: 'https://www.wtysysu.cn:10443/v1/task/recipient/9?userId=2',
+      method: 'POST',
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+      }
+    })
+    //
+    //////////////////////////////////////
   },
 
 
@@ -168,12 +206,35 @@ Page({
     this.setData({
       taskID: options.taskID
     })
-    ///////////////////////////////
-    //
-    //这里根据this.data.taskID获取对应的任务内容
-    //
-    ///////////////////////////////
 
+    /////////////////////////////////////////
+    //
+    //接受者查询自己接受任务的信息
+    //
+    console.log('GET /task/recipient/settleup/{taskId}')
+    var self = this
+    wx.request({
+      // url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID + '?userId=2',
+      url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/1?userId=2',
+      method: 'GET',
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+        self.setData({
+          taskReward: res.data.reward,
+          taskInfo: res.data.description,
+          // taskName: ,
+          // imageURL: ,
+          tags: res.data.label.split(' '),
+          // state: res.data.state,
+          // questionnairePath: (res.data.task.type == types[0] ? res.data.task.questionnairePath : null),
+          type: res.data.type,
+        })
+      }
+    })
+    /////////////////////////////////////////
 
     //暂时用下面的作为效果展示，最终需要根据ID从服务端获取
     if(this.data.taskID=='1'){
@@ -263,7 +324,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-    wx.stopPullDownRefresh()
+
   },
 
   /**
@@ -279,4 +340,5 @@ Page({
   onShareAppMessage: function () {
 
   }
+
 })

@@ -140,7 +140,18 @@ Page({
    * 删除当前任务
    */
   deleteTask(){
-    //this.data.taskID是string格式，请自己转换成integer
+    console.log('DELETE /task/publisher/{taskId}')
+    wx.request({
+      // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
+      url: 'https://www.wtysysu.cn:10443/v1/task/publisher/5?userId=2',
+      method: 'DELETE',
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+      }
+    })
   },
 
   /**
@@ -312,6 +323,24 @@ Page({
     //{  userID: 用户ID,
     //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
     // }
+    // console.log('POST /task/publisher/confirm/{taskId}')
+    // wx.request({
+    //   url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + taskId,
+    //   method: 'POST',
+    //   header: {
+    //     'accept': 'application/json',
+    //     'content-type': 'application/json'
+    //   },
+    //   body: {
+    //     'confirm': true,				// boolean
+    //     'users': [							// list of integer
+    //       0, 1, 5
+    //     ]
+    //   },
+    //   success(res) {
+    //     console.log(res)
+    //   }
+    // })
     //
     ////////////////////////////////
 
@@ -331,6 +360,27 @@ Page({
     //这里需要根据taskID获取对应的信息
     //将获取到的待验收信息push进usersDataTemp
     //
+    console.log('GET /task/publisher/confirm/{taskId}')
+    wx.request({
+      // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + options.taskID + '?userId=2',
+      url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/1?userId=2',
+      method: 'GET',
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+        // console.log(res.data.length)
+        // res.data.forEach(function(user_info){
+        //   var user_data = {
+        //     // state: ,
+        //     userID: user_info.user.id,
+        //     imageURL: user_info.proveURL
+        //   }
+        //   usersDataTemp.push(user_data)
+        // })
+      }
+    })
     ///////////////////////////////////
 
     //下面的数据都是暂时代替服务器的
@@ -368,6 +418,33 @@ Page({
     /////////////////////////
     //
     //根据taskID获取本页面的任务内容（不包括验收内容）
+    //
+    console.log('GET /task/publisher/{taskId}')
+    var self = this
+    wx.request({
+      // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '&userId=2',
+      url: 'https://www.wtysysu.cn:10443/v1/task/publisher/6?userId=2',
+      method: 'GET',
+      header: {
+        'accept': 'application/json'
+      },
+      success(res) {
+        console.log(res)
+        
+        self.setData({
+          taskReward: res.data.reward,
+          taskInfo: res.data.description,
+          // taskName: ,
+          // imageURL: ,
+          tags: res.data.label.split(' '),
+          // state: res.data.state,
+          type: res.data.type,
+          taskTypeSelection: (res.data.type == types[0] ? 0 : 1),
+          taskDDL: res.data.deadline,
+          taskMaxAccept: res.data.maxAccept,
+        })
+      }
+    })
     //
     /////////////////////////
 
@@ -457,7 +534,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-    wx.stopPullDownRefresh()
+
   },
 
   /**
