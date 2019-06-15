@@ -8,7 +8,7 @@ var task1 = {
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
   tags: ["跑腿", "广州",'待验收'],
   state:states[2],
-  taskID:'1'
+  taskID:'100000'
 }
 var task2 = {
   taskReward: 3,
@@ -17,7 +17,7 @@ var task2 = {
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
   tags: ["问卷", "调查",'待完成'],
   state:states[1],
-  taskID:'2'
+  taskID:'100001'
 }
 
 Page({
@@ -314,22 +314,26 @@ Page({
         },
         success(res) {
           console.log(res)
-          console.log(res.data.length)
-          res.data.forEach(function (atask) {
-            let taskTag = atask.label.split(" ")
-            let _atask = {
-              taskReward: atask.reward,
-              taskInfo: atask.description,
-              taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
-              imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-              tags: taskTag,
-              state: states[3],
-              taskID: atask.id
-            }
-            taskListPre.push(_atask)
-          })
-          resolve('ok')
+          if (res.data!=null){
+            res.data.forEach(function (atask) {
+              let taskTag = atask.label.split(" ")
+              let _atask = {
+                taskReward: atask.reward,
+                taskInfo: atask.description,
+                taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
+                imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                tags: taskTag,
+                state: states[3],
+                taskID: atask.id
+              }
+              taskListPre.push(_atask)
+            })
+            resolve('ok')
+          }
+          resolve('null')
         }
+          
+          
       })
     })
     // 
@@ -413,22 +417,23 @@ Page({
             'accept': 'application/json'
           },
           success(res) {
-            console.log(res)
-            console.log(res.data.length)
-            res.data.forEach(function (atask) {
-              let taskTag = atask.label.split(" ")
-              let _atask = {
-                taskReward: atask.reward,
-                taskInfo: atask.description,
-                taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
-                imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-                tags: taskTag,
-                state: states[3],
-                taskID: atask.id
-              }
-              _taskList.push(_atask)
-            })
-            resolve('ok')
+            if (res.data != null) {
+              res.data.forEach(function (atask) {
+                let taskTag = atask.label.split(" ")
+                let _atask = {
+                  taskReward: atask.reward,
+                  taskInfo: atask.description,
+                  taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
+                  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                  tags: taskTag,
+                  state: states[3],
+                  taskID: atask.id
+                }
+                _taskList.push(_atask)
+              })
+              resolve('ok')
+            }
+            resolve('null')
           }
         })
       } )
@@ -466,11 +471,24 @@ Page({
           },
           success(res) {
             console.log(res)
-            console.log(res.data.length)
-            res.data.forEach(function (atask) {
-              _myTasks.push(atask)
-            })
-            resolve('ok')
+            if (Array.isArray(res.data)){
+              res.data.forEach(function (atask) {
+                let taskTag = atask.label.split(" ")
+                let _atask = {
+                  taskReward: atask.reward,
+                  taskInfo: atask.description,
+                  taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
+                  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                  tags: taskTag,
+                  state: states[3],
+                  taskID: atask.id
+                }
+                _myTasks.push(_atask)
+              })
+              resolve('ok')
+            }
+          resolve('null')
+            
           }
         })
       })
@@ -478,9 +496,23 @@ Page({
       //
       //////////////////////////
       taskPromise.then( (resolve)=>{
+        _myTasks.push(task1)
+        _myTasks.push(task2)
         this.setData({
-          myTasks: _myTasks
+          myTasks: _myTasks,
+          myPendingTasks: [],
+          myDoingTasks: [],
+          myCheckingTasks: [],
+          myOtherTasks: []
         })
+        console.log(resolve)
+        console.log(_myTasks)
+
+        this.preparePendingTasks()
+        this.prepareDoingTasks()
+        this.prepareCheckingTasks()
+        this.prepareOtherTasks()
+
       } )
 
       
