@@ -1,3 +1,4 @@
+
 // pages/task_datail/task_detail.js
 
 import Dialog from '../../../dist/dialog/dialog';
@@ -173,7 +174,7 @@ Page({
       taskInfo: this.data.taskInfo,
       tags: this.data.tags,
       taskMaxAccept: this.data.taskMaxAccept,
-      
+      taskID:this.data.taskID
     }
     wx.redirectTo({
       url: '../../TaskRelease/main/main?info=' + JSON.stringify(info),
@@ -430,19 +431,23 @@ Page({
       },
       success(res) {
         console.log(res)
+        if(res.data.taskInfo){
+          self.setData({
+            taskReward: res.data.reward,
+            taskInfo: res.data.description,
+            taskName: (res.data.type == '跑腿') ? "跑腿任务" : "问卷任务",
+            imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+            tags: res.data.label.split(' '),
+            state: res.data.state,
+            type: res.data.type,
+            taskTypeSelection: (res.data.type == types[0] ? 0 : 1),
+            taskDDL: res.data.deadline,
+            taskMaxAccept: res.data.maxAccept,
+          })
+        }else{
+          console.log('err')
+        }
         
-        self.setData({
-          taskReward: res.data.reward,
-          taskInfo: res.data.description,
-          // taskName: ,
-          // imageURL: ,
-          tags: res.data.label.split(' '),
-          // state: res.data.state,
-          type: res.data.type,
-          taskTypeSelection: (res.data.type == types[0] ? 0 : 1),
-          taskDDL: res.data.deadline,
-          taskMaxAccept: res.data.maxAccept,
-        })
       }
     })
     //
@@ -550,4 +555,5 @@ Page({
   onShareAppMessage: function () {
 
   }
+
 })

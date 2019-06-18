@@ -3,7 +3,9 @@
 
 //submit task函数可用于后台调试
 
+
 //发布方，state对应为[4,5,6]
+
 var states = ['pending', 'doing', 'finished']
 var types = ['questionnaire', 'errand']
 
@@ -60,6 +62,7 @@ Page({
     //发布的任务类型，0-问卷，1-跑腿
     taskTypeSelection:'0',
     taskDDL:'',
+
     taskReward:1,
     taskName:'',
     taskInfo:'',
@@ -67,6 +70,7 @@ Page({
     taskMaxAccept:1,
 
 
+    isModifyTask:false,
     
 
     currentDate: new Date().getTime(),
@@ -115,6 +119,7 @@ Page({
    * 提交之后跳转到已发布任务界面，发布者可以查看自己发布的任务情况
    */
   submitTask() {
+
     
     //异常处理
     if (this.data.taskName.length==0){
@@ -150,6 +155,7 @@ Page({
       return
     }
     
+
     /////////////////////////
     //
     //这里可以发布新任务，也是修改任务的地方
@@ -163,7 +169,7 @@ Page({
     //taskMaxAccept:0,
     //
 
-    // if (!isModifyTask) {
+    if (!this.data.isModifyTask) {
       console.log('POST /task/publisher')
       console.log(this.data)
       wx.request({
@@ -173,13 +179,15 @@ Page({
           'accept': 'application/json',
           'content-type': 'application/json'
         },
-        body: {
+        data: {
           'type': types[Number(this.data.taskTypeSelection)],
           'description': this.data.taskInfo,
           'reward': this.data.taskReward,
           'deadline': this.data.taskDDL,
           'label': this.data.tags,
-          //'state': 5, // 发布方doing
+
+          'state': 5, // 发布方doing
+
           'priority': 0,
           'maxAccept': this.data.taskMaxAccept,
           'hasAccept': 0,
@@ -189,36 +197,37 @@ Page({
           console.log(res)
         }
       })
-    // } else {
+    } 
+    else {
       
-      // console.log('PUT /task/publisher{taskId}')
-      // console.log(this.data)
-      // wx.request({
-      //   // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
-      //   url: 'https://www.wtysysu.cn:10443/v1/task/publisher/5?userId=2',
-      //   method: 'PUT',
-      //   header: {
-      //     'accept': 'application/json',
-      //     'content-type': 'application/json'
-      //   },
-      //   body: {
-      //     'tid': Number(this.data.taskID),
-      //     'type': types[Number(this.data.taskTypeSelection)],
-      //     'description': this.data.taskInfo,
-      //     'reward': this.data.taskReward,
-      //     'deadline': this.data.taskDDL,
-      //     'labels': this.data.tags,
-      //     // 'state': this.data.state, // pending
-      //     'priority': 0,
-      //     'maxAccept': this.data.taskMaxAccept,
-      //     // 'hasAccept': this.data.hasAccept,
-      //     'publisher': getApp().globalData.userInfo['nickName']
-      //   },
-      //   success(res) {
-      //     console.log(res)
-      //   }
-      // })
-    // }
+      console.log('PUT /task/publisher{taskId}')
+      console.log(this.data)
+      wx.request({
+        // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/5?userId=2',
+        method: 'PUT',
+        header: {
+          'accept': 'application/json',
+          'content-type': 'application/json'
+        },
+        body: {
+          'tid': Number(this.data.taskID),
+          'type': types[Number(this.data.taskTypeSelection)],
+          'description': this.data.taskInfo,
+          'reward': this.data.taskReward,
+          'deadline': this.data.taskDDL,
+          'labels': this.data.tags,
+          // 'state': this.data.state, // pending
+          'priority': 0,
+          'maxAccept': this.data.taskMaxAccept,
+          // 'hasAccept': this.data.hasAccept,
+          'publisher': getApp().globalData.userInfo['nickName']
+        },
+        success(res) {
+          console.log(res)
+        }
+      })
+    }
     /////////////////////////
     
     //完成发布或者修改
@@ -372,7 +381,7 @@ Page({
   prepareDoingTasks() {
     let listTemp = this.data.myDoingTasks
     this.data.taskList.forEach(task => {
-      if (task.state == states[1]) {
+      if (task.state == states[1] || !task.state) {
         listTemp.push(task)
         this.setData({
           myDoingTasks: listTemp
@@ -430,49 +439,64 @@ Page({
         tags: info.tags,
         taskMaxAccept: info.taskMaxAccept,
         selection: 1,
-        active: 1
+        active: 1,
+        taskID: info.taskID,
+        isModifyTask:true
       })
 
+    }else{
+      let taskListPre = this.data.taskList
+      ///////////////////////////////////////
+      //
+      //将获取到的任务装入taskListPre
+      //
+      console.log('GET /task/publisher')
+      wx.request({
+        // pageid: integer, keyword: string
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
+        method: 'GET',
+        header: {
+          'accept': 'application/json'
+        },
+        success(res) {
+          console.log(res)
+          console.log(res.data.length)
+          res.data.forEach(function (atask) {
+            let _atask = {
+              taskReward: atask.reward,
+              taskInfo: atask.description,
+              taskName: atask.type == '' ? '跑腿任务' : '问卷任务',//默认为跑腿
+              imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+              tags: atask.label.length == 0 ? ['无'] : atask.label.split(" "),
+              state: states[atask.state-4],//这里
+              taskID: atask.tid
+            }
+            
+            taskListPre.push(_atask)
+          })
+        }
+      })
+      //
+      ////////////////////////////////////////
+      taskListPre.push(task1)
+      taskListPre.push(task2)
+
+      this.setData({
+        taskList: taskListPre,
+        userInfo: getApp().globalData.userInfo,
+        myPendingTasks: [],
+        myDoingTasks: [],
+        myFinishedTasks: [],
+        isModifyTask: false
+      })
+
+      this.preparePendingTasks()
+      this.prepareDoingTasks()
+      this.prepareCheckingTasks()
     }
 
     
-    let taskListPre = this.data.taskList
-    ///////////////////////////////////////
-    //
-    //将获取到的任务装入taskListPre
-    //
-    console.log('GET /task/publisher')
-    wx.request({
-      // pageid: integer, keyword: string
-      url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
-      method: 'GET',
-      header: {
-        'accept': 'application/json'
-      },
-      success(res) {
-        console.log(res)
-        console.log(res.data.length)
-        res.data.forEach(function (atask) {
-          taskListPre.push(atask)
-        })
-      }
-    })
-    //
-    ////////////////////////////////////////
-    taskListPre.push(task1)
-    taskListPre.push(task2)
-
-    this.setData({
-      taskList: taskListPre,
-      userInfo: getApp().globalData.userInfo,
-      myPendingTasks: [],
-      myDoingTasks: [],
-      myFinishedTasks: [],
-    })
-
-    this.preparePendingTasks()
-    this.prepareDoingTasks()
-    this.prepareCheckingTasks()
+    
   },
 
   /**
@@ -526,6 +550,7 @@ Page({
       console.log('GET /task/publisher')
       console.log('search_value: ' + this.data.search_value)
 
+
       let taskPromise=new Promise((resolve,reject)=>{
         wx.request({
           url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
@@ -537,13 +562,13 @@ Page({
             console.log(res)
             if (Array.isArray(res.data)){
               res.data.forEach(function (atask) {
-                let _astak={
+                let _atask={
                   taskReward: atask.reward,
                   taskInfo:atask.description,
-                  taskName: task.type==''?'跑腿任务':'问卷任务',//默认为跑腿
+                  taskName: atask.type==''?'跑腿任务':'问卷任务',//默认为跑腿
                   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
                   tags: atask.label.length==0? ['无']:atask.label.split(" "),
-                  state: states[1],//这里后端暂时没有
+                  state: states[atask.state-4],//这里
                   taskID:atask.tid
                 }
                 taskList.push(_atask)
@@ -578,6 +603,7 @@ Page({
       })
       
       
+
     }
     
   },
