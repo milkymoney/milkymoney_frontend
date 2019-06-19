@@ -17,7 +17,7 @@ var task1 = {
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
   tags: ["跑腿", "广州", '进行中'],
   state: states[1],
-  taskID: '1',
+  taskID: '100000',
   taskTypeSelection: '1',
   taskDDL: '2019/10/1 下午10:00:00',
   taskMaxAccept: 5,
@@ -30,7 +30,7 @@ var task2 = {
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
   tags: ["问卷", "调查", '进行中'],
   state: states[1],
-  taskID: '2',
+  taskID: '100001',
   taskTypeSelection: '0',
   taskDDL: '2019/7/1 上午8:00:00',
   taskMaxAccept: 15,
@@ -453,7 +453,7 @@ Page({
     //
     /////////////////////////
 
-    if (this.data.taskID == '1') {
+    if (this.data.taskID == '100000') {
       this.setData({
         taskReward: task1.taskReward,
         taskInfo: task1.taskInfo,
@@ -466,7 +466,7 @@ Page({
         taskDDL: task1.taskDDL,
         taskMaxAccept: task1.taskMaxAccept,
       })
-    } else if (this.data.taskID == '2') {
+    } else if (this.data.taskID == '100001') {
       this.setData({
         taskReward: task2.taskReward,
         taskInfo: task2.taskInfo,

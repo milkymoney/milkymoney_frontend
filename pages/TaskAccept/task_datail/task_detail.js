@@ -16,7 +16,7 @@ var task1 = {
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
   tags: ["跑腿", "广州", '待审核'],
   state: states[2],
-  taskID: '1',
+  taskID: '100000',
   questionnairePath: null,
   type:'errand'
 }
@@ -27,7 +27,7 @@ var task2 = {
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
   tags: ["问卷", "调查", '待完成'],
   state: states[1],
-  taskID: '2',
+  taskID: '100001',
   questionnairePath:'pages/wjxqList/wjxqList?activityId=39109067',
   type:'questionnaire'
 }
@@ -243,7 +243,7 @@ Page({
     /////////////////////////////////////////
 
     //暂时用下面的作为效果展示，最终需要根据ID从服务端获取
-    if(this.data.taskID=='1'){
+    if (this.data.taskID =='100000'){
       this.setData({
         taskReward: task1.taskReward,
         taskInfo: task1.taskInfo,
@@ -254,7 +254,7 @@ Page({
         questionnairePath:task1.questionnairePath,
         type:task1.type
       })
-    }else if(this.data.taskID=='2'){
+    } else if (this.data.taskID =='100001'){
       this.setData({
         taskReward: task2.taskReward,
         taskInfo: task2.taskInfo,
