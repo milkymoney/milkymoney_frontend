@@ -2,10 +2,8 @@
 
 
 //submit task函数可用于后台调试
-
-
+ 
 //发布方，state对应为[4,5,6]
-
 var states = ['pending', 'doing', 'finished']
 var types = ['questionnaire', 'errand']
 
@@ -16,7 +14,7 @@ var task1 = {
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
   tags: ["跑腿", "广州", '进行中'],
   state: states[1],
-  taskID: '100000'
+  taskID: '100001'
 }
 var task2 = {
   taskReward: 3,
@@ -25,7 +23,7 @@ var task2 = {
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
   tags: ["问卷", "调查", '进行中'],
   state: states[1],
-  taskID: '100001'
+  taskID: '100002'
 }
 
 Page({
@@ -62,7 +60,6 @@ Page({
     //发布的任务类型，0-问卷，1-跑腿
     taskTypeSelection:'0',
     taskDDL:'',
-
     taskReward:1,
     taskName:'',
     taskInfo:'',
@@ -70,8 +67,8 @@ Page({
     taskMaxAccept:1,
 
 
+
     isModifyTask:false,
-    
 
     currentDate: new Date().getTime(),
     show: {
@@ -119,8 +116,7 @@ Page({
    * 提交之后跳转到已发布任务界面，发布者可以查看自己发布的任务情况
    */
   submitTask() {
-
-    
+    console.log(this.data)
     //异常处理
     if (this.data.taskName.length==0){
       wx.showToast({
@@ -155,7 +151,6 @@ Page({
       return
     }
     
-
     /////////////////////////
     //
     //这里可以发布新任务，也是修改任务的地方
@@ -170,81 +165,115 @@ Page({
     //
 
     if (!this.data.isModifyTask) {
-      console.log('POST /task/publisher')
-      console.log(this.data)
-      wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/publisher?userId=2',
-        method: 'POST',
-        header: {
-          'accept': 'application/json',
-          'content-type': 'application/json'
-        },
-        data: {
-          'type': types[Number(this.data.taskTypeSelection)],
-          'description': this.data.taskInfo,
-          'reward': this.data.taskReward,
-          'deadline': this.data.taskDDL,
-          'label': this.data.tags,
+      let taskPromise = new Promise((resolve, reject) => {
+        console.log('POST /task/publisher')
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/?userId=2',  
+          method: 'POST',
+          header: {
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          data: {
+            'type': types[Number(this.data.taskTypeSelection)],
+            'description': this.data.taskInfo,
+            'reward': this.data.taskReward,
+            'deadline': this.data.taskDDL,
+            'label': this.data.tags,
+            'taskName': "",
+            'priority': 0,
+            'maxAccept': this.data.taskMaxAccept,
+            'hasAccept': 0,
+          },
+          success(res) {
+            console.log(res)
+            resolve(res.data)
+          }
+        })
+      })
 
-          'state': 5, // 发布方doing
-
-          'priority': 0,
-          'maxAccept': this.data.taskMaxAccept,
-          'hasAccept': 0,
-          'publisher': getApp().globalData.userInfo['nickName']
-        },
-        success(res) {
-          console.log(res)
+      taskPromise.then((resolve) => {
+        if (resolve.success) {
+          //完成发布或者修改
+          wx.showToast({
+            title: resolve.message, // '已发布成功/修改'
+            icon: 'success',
+            duration: 2000,
+            success: () => {
+              //跳转界面
+              this.setData({
+                selection: 3,
+                active: 3
+              });
+              this.onPullDownRefresh()
+            }
+          })
+        } else {
+          wx.showToast({
+            title: resolve.message,
+            icon: 'none',
+            duration: 2000,
+          })
         }
       })
-    } 
-    else {
-      
-      console.log('PUT /task/publisher{taskId}')
-      console.log(this.data)
-      wx.request({
-        // url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
-        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/5?userId=2',
-        method: 'PUT',
-        header: {
-          'accept': 'application/json',
-          'content-type': 'application/json'
-        },
-        body: {
-          'tid': Number(this.data.taskID),
-          'type': types[Number(this.data.taskTypeSelection)],
-          'description': this.data.taskInfo,
-          'reward': this.data.taskReward,
-          'deadline': this.data.taskDDL,
-          'labels': this.data.tags,
-          // 'state': this.data.state, // pending
-          'priority': 0,
-          'maxAccept': this.data.taskMaxAccept,
-          // 'hasAccept': this.data.hasAccept,
-          'publisher': getApp().globalData.userInfo['nickName']
-        },
-        success(res) {
-          console.log(res)
+    } else {
+      let taskPromise = new Promise((resolve, reject) => {
+        console.log('PUT /task/publisher/{taskId}')
+        console.log(this.data.tags)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
+          method: 'PUT',
+          header: {
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          data: {
+            'type': types[Number(this.data.taskTypeSelection)],
+            'description': this.data.taskInfo,
+            'reward': this.data.taskReward,
+            'deadline': this.data.taskDDL,
+            'label': this.data.tags,
+            'taskName': "",
+            'priority': 0,
+            'maxAccept': this.data.taskMaxAccept,
+            'hasAccept': 0,
+            'userid': 2
+          },
+          success(res) {
+            
+            console.log(res)
+            resolve(res.data)
+          }
+        })
+      })
+
+      taskPromise.then((resolve) => {
+        if (resolve.success) {
+          //完成发布或者修改
+          wx.showToast({
+            title: resolve.message, // '已发布成功/修改'
+            icon: 'success',
+            duration: 2000,
+            success: () => {
+              //跳转界面
+              this.setData({
+                selection: 3,
+                active: 3
+              });
+              this.onPullDownRefresh()
+            }
+          })
+        } else {
+          wx.showToast({
+            title: resolve.message,
+            icon: 'none',
+            duration: 2000,
+          })
         }
       })
     }
     /////////////////////////
     
-    //完成发布或者修改
-    wx.showToast({
-      title: '已发布成功/修改',
-      icon: 'success',
-      duration: 2000,
-      success:()=>{
-        //跳转界面
-        this.setData({
-          selection: 3,
-          active:3
-        });
-      }
-    })
-    
-
     console.log('提交审核')
   },
 
@@ -335,12 +364,19 @@ Page({
       active: event.detail
     });
 
-    //跳转到接受任务界面
+    //跳转到接受任务界面  
     if(this.data.selection==2){
       wx.redirectTo({
         url: '../../TaskAccept/main/main',
       })
+    } else if (this.data.selection==0 || this.data.selection==4) {
+      if (this.data.isModifyTask == true) {
+        this.data.isModifyTask = false
+      }
+    } else if (this.data.selection==3) {
+      this.onPullDownRefresh()
     }
+
 
   },
   
@@ -363,7 +399,7 @@ Page({
       this.prepareDoingTasks()
     } else if (event.detail.index == 2) {
       //已完成
-      this.prepareCheckingTasks()
+      this.prepareFinishedTasks()
     } 
   },
 
@@ -389,13 +425,13 @@ Page({
       }
     })
   },
-  prepareCheckingTasks(){
-    let listTemp = this.data.myCheckingTasks
+  prepareFinishedTasks(){
+    let listTemp = this.data.myFinishedTasks
     this.data.taskList.forEach(task => {
       if (task.state == states[2]) {
         listTemp.push(task)
         this.setData({
-          myCheckingTasks: listTemp
+          myFinishedTasks: listTemp
         })
       }
     })
@@ -436,7 +472,7 @@ Page({
         taskReward: info.taskReward,
         taskName: info.taskName,
         taskInfo: info.taskInfo,
-        tags: info.tags,
+        tags: info.tags.join(" "),
         taskMaxAccept: info.taskMaxAccept,
         selection: 1,
         active: 1,
@@ -444,15 +480,16 @@ Page({
         isModifyTask:true
       })
 
-    }else{
+    } else {
       let taskListPre = this.data.taskList
-      ///////////////////////////////////////
-      //
-      //将获取到的任务装入taskListPre
-      //
+    ///////////////////////////////////////
+    //
+    //将获取到的任务装入taskListPre
+    //
+    let taskPromise = new Promise((resolve, reject) => {
       console.log('GET /task/publisher')
+      console.log('search_value: ' + this.data.search_value)
       wx.request({
-        // pageid: integer, keyword: string
         url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
         method: 'GET',
         header: {
@@ -460,24 +497,30 @@ Page({
         },
         success(res) {
           console.log(res)
-          console.log(res.data.length)
-          res.data.forEach(function (atask) {
-            let _atask = {
-              taskReward: atask.reward,
-              taskInfo: atask.description,
-              taskName: atask.type == '' ? '跑腿任务' : '问卷任务',//默认为跑腿
-              imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-              tags: atask.label.length == 0 ? ['无'] : atask.label.split(" "),
-              state: states[atask.state-4],//这里
-              taskID: atask.tid
-            }
-            
-            taskListPre.push(_atask)
-          })
+          if (Array.isArray(res.data)) {
+            res.data.forEach(function (atask) {
+              let taskTag = atask.label.split(" ")
+              let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+              let _atask = {
+                taskReward: atask.reward,
+                taskInfo: atask.description,
+                taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                imageURL: imgURL,
+                tags: taskTag,
+                state: states[atask.state - 4],
+                taskID: atask.tid
+              }
+              taskListPre.push(_atask)
+            })
+            resolve('ok')
+          }
+          resolve('null')
         }
       })
-      //
-      ////////////////////////////////////////
+    })
+    //
+    ////////////////////////////////////////
+    taskPromise.then((resolve) => {
       taskListPre.push(task1)
       taskListPre.push(task2)
 
@@ -490,12 +533,15 @@ Page({
         isModifyTask: false
       })
 
+      console.log(resolve)
+      console.log(taskListPre)
+
       this.preparePendingTasks()
       this.prepareDoingTasks()
-      this.prepareCheckingTasks()
+      this.prepareFinishedTasks()
+    })
     }
 
-    
     
   },
 
@@ -547,11 +593,9 @@ Page({
       //
       //将获取到的push到taskList
       //
-      console.log('GET /task/publisher')
-      console.log('search_value: ' + this.data.search_value)
-
-
       let taskPromise=new Promise((resolve,reject)=>{
+        console.log('GET /task/publisher')
+        console.log('search_value: ' + this.data.search_value)
         wx.request({
           url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
           method: 'GET',
@@ -562,27 +606,29 @@ Page({
             console.log(res)
             if (Array.isArray(res.data)){
               res.data.forEach(function (atask) {
-                let _atask={
+                let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+                let _atask = {
                   taskReward: atask.reward,
                   taskInfo:atask.description,
-                  taskName: atask.type==''?'跑腿任务':'问卷任务',//默认为跑腿
-                  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-                  tags: atask.label.length==0? ['无']:atask.label.split(" "),
-                  state: states[atask.state-4],//这里
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
+                  tags: taskTag,
+                  state: states[atask.state - 4],
                   taskID:atask.tid
                 }
                 taskList.push(_atask)
               })
+              resolve('ok')
             }
-            
-            resolve('ok')
+            resolve('null')
           }
         })
       })
       
       // 
       ///////////////////////////
-      taskPromise.then((res)=>{
+      taskPromise.then((resolve)=>{
         taskList.push(task1)
         taskList.push(task2)
         this.setData({
@@ -590,20 +636,19 @@ Page({
           myPendingTasks: [],
           myDoingTasks: [],
           myFinishedTasks: [],
+          isModifyTask: false
         })
-        console.log(this.data.taskList)
+        console.log(resolve)
+        console.log(taskList)
 
         this.preparePendingTasks()
         this.prepareDoingTasks()
-        this.prepareCheckingTasks()
+        this.prepareFinishedTasks()
 
         //加载完成
         wx.hideNavigationBarLoading()
         wx.stopPullDownRefresh()
       })
-      
-      
-
     }
     
   },

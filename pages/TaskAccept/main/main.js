@@ -1,6 +1,6 @@
 // pages/TaskAccept/main/main.js
 var states=['pending','doing','checking','other']
-
+var types = ['questionnaire', 'errand']
 var task1 = {
   taskReward: 5,
   taskInfo: "地点广州大学城，时间在2.29，先到先得",
@@ -8,7 +8,7 @@ var task1 = {
   imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
   tags: ["跑腿", "广州",'待验收'],
   state:states[2],
-  taskID:'100000'
+  taskID:'100001'
 }
 var task2 = {
   taskReward: 3,
@@ -17,7 +17,7 @@ var task2 = {
   imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
   tags: ["问卷", "调查",'待完成'],
   state:states[1],
-  taskID:'100001'
+  taskID:'100002'
 }
 
 Page({
@@ -30,6 +30,7 @@ Page({
     search_value_personal: '',
 
     selection: 0,
+    active: 0,
     location_city:'广州',
     taskList:[],
     //找任务筛选显示
@@ -70,8 +71,26 @@ Page({
    */
   navToTaskDetail(event) {
     //console.log(event)
+
+    console.log(this.data)
+    let selectedTask = {}
+    this.data.taskList.forEach(function(atask) {
+      if (atask.taskID == event.target.id) {
+        selectedTask = atask
+      }
+    })
+    console.log(selectedTask)
+    if (Array.isArray(selectedTask.tags))
+      selectedTask.tags = selectedTask.tags.join(' ')
+
     wx.navigateTo({
-      url: '../task_datail/task_detail?taskID='+event.target.id,
+      url: '../task_datail/task_detail?taskID=' + selectedTask.taskID 
+                      + '&state=' + selectedTask.state 
+                      + '&tags=' + selectedTask.tags 
+                      + '&taskReward=' + selectedTask.taskReward
+                      + '&taskInfo=' + selectedTask.taskInfo
+                      + '&taskName=' + selectedTask.taskName
+                      + '&type=' + selectedTask.type
     })
   },
 
@@ -180,7 +199,8 @@ Page({
    */
   onChange: function (event) {
     this.setData({
-      selection: event.detail
+      selection: event.detail,
+      active: event.detail
     });
 
     //跳转到发布任务界面
@@ -188,6 +208,10 @@ Page({
       wx.redirectTo({
         url: '../../TaskRelease/main/main',
       })
+    } else if (this.data.selection == 0 || this.data.selection == 1) {
+      this.onPullDownRefresh()
+    } else if (this.data.selection == 3) {
+      this.onPullDownRefresh()
     }
 
   },
@@ -223,6 +247,7 @@ Page({
    * 切换任务袋的tab
    */
   onChangeTab(event){
+    this.onPullDownRefresh()
     //这里未完成，以后需要从服务端获取对应的个人任务
     this.setData({
       myTasks:this.data.taskList,
@@ -296,7 +321,13 @@ Page({
    * 将获取到的任务push进taskListPre
    */
   onLoad: function (options) {
-
+    if (options.selection != null) {
+      this.setData({
+        selection: options.selection,
+        active: options.selection
+      })
+      this.onPullDownRefresh()
+    }
     let taskListPre = this.data.taskList
 
     //////////////////////////
@@ -314,17 +345,20 @@ Page({
         },
         success(res) {
           console.log(res)
-          if (res.data!=null){
+          if (res.data != null){
             res.data.forEach(function (atask) {
+              console.log(atask)
               let taskTag = atask.label.split(" ")
+              let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
               let _atask = {
                 taskReward: atask.reward,
                 taskInfo: atask.description,
-                taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
-                imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                type: atask.type,
+                taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                imageURL: imgURL,
+                state: 3,
                 tags: taskTag,
-                state: states[atask.state],
-                taskID: atask.id
+                taskID: atask.tid
               }
               taskListPre.push(_atask)
             })
@@ -335,7 +369,6 @@ Page({
           
           
       })
-
     })
     // 
     //
@@ -355,13 +388,15 @@ Page({
         myOtherTasks: []
       })
 
+      console.log(resolve)
+      console.log(taskListPre)
+
       this.preparePendingTasks()
       this.prepareDoingTasks()
       this.prepareCheckingTasks()
       this.prepareOtherTasks()
     })
     
-
   },
 
   /**
@@ -398,7 +433,6 @@ Page({
   onPullDownRefresh: function () {
     //在标题栏中显示加载
     wx.showNavigationBarLoading()
-
     //这里增加刷新函数
     if(this.data.selection==0||this.data.selection==1){
       //下拉刷新所有的可见已发布任务
@@ -408,7 +442,6 @@ Page({
       //
       //将获取到的所有已发布任务装入_taskList
       //
-
 
       let taskPromise=new Promise( (resolve,reject)=>{
         console.log('GET /task')
@@ -423,14 +456,16 @@ Page({
             if (res.data != null) {
               res.data.forEach(function (atask) {
                 let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
                   taskInfo: atask.description,
-                  taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
-                  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                  type: atask.type,
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
+                  state: 3,
                   tags: taskTag,
-                  state: states[atask.state],
-                  taskID: atask.id
+                  taskID: atask.tid
                 }
                 _taskList.push(_atask)
               })
@@ -450,9 +485,12 @@ Page({
         this.setData({
           taskList: _taskList
         })
+
+        console.log(resolve)
+        console.log(_taskList)
+
       } )
       
-
 
 
     }else if(this.data.selection==3){
@@ -464,12 +502,11 @@ Page({
       //将获取到的自己接收到的放入_myTasks
       //
 
-
       let taskPromise=new Promise((resolve,reject)=>{
         console.log('GET /task/recipient')
         console.log('search value personal: ' + this.data.search_value_personal)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page=0&keyword=' + this.data.search_value_personal + '&userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page=0&keyword=' + this.data.search_value_personal + '&userId=3',
           method: 'GET',
           header: {
             'accept': 'application/json'
@@ -479,20 +516,22 @@ Page({
             if (Array.isArray(res.data)){
               res.data.forEach(function (atask) {
                 let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
                   taskInfo: atask.description,
-                  taskName: (atask.type == '跑腿') ? "跑腿任务" : "问卷任务",
-                  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+                  type: atask.type,
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
                   tags: taskTag,
                   state: states[atask.state],
-                  taskID: atask.id
+                  taskID: atask.tid
                 }
                 _myTasks.push(_atask)
               })
               resolve('ok')
             }
-          resolve('null')
+            resolve('null')
             
           }
         })
@@ -519,6 +558,9 @@ Page({
         this.prepareOtherTasks()
 
       } )
+
+      
+
     }
 
     //加载完成
