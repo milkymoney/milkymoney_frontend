@@ -66,8 +66,9 @@ Page({
     tags:'',
     taskMaxAccept:1,
 
+    taskQuestionID: 39109067,
 
-
+    // 判断提交是否为创建还是修改类型
     isModifyTask:false,
 
     currentDate: new Date().getTime(),
@@ -150,6 +151,14 @@ Page({
       })
       return
     }
+    if (!Number.isInteger(this.data.taskQuestionID) ){
+      wx.showToast({
+        title: '问卷ID必须为数字类型!',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
     
     /////////////////////////
     //
@@ -184,6 +193,7 @@ Page({
             'priority': 0,
             'maxAccept': this.data.taskMaxAccept,
             'hasAccept': 0,
+            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire' ? this.data.taskQuestionID : null
           },
           success(res) {
             console.log(res)
@@ -237,7 +247,8 @@ Page({
             'priority': 0,
             'maxAccept': this.data.taskMaxAccept,
             'hasAccept': 0,
-            'userid': 2
+            'userid': 2,
+            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire'?this.data.taskQuestionID:null
           },
           success(res) {
             
@@ -322,6 +333,15 @@ Page({
     this.setData({
       taskTypeSelection: value
     });
+  },
+
+  /**
+   * 设置问卷星的问卷链接
+   */
+  onChangeTaskQuestionID({detail}){
+    this.setData({
+      taskQuestionID:detail
+    })
   },
 
   /**

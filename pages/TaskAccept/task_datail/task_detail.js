@@ -58,15 +58,15 @@ Page({
     steps: [
       {
         text: '待审核阶段',
-        desc: '审核中，这里可以自己根据需要修改'
+        desc: '审核中，你需要等待任务发布者的审核'
       },
       {
         text: '进行阶段',
-        desc: '进行中，这里可以自己根据需要修改'
+        desc: '进行中，请在最终期限之前完成任务'
       },
       {
         text: '待验收阶段',
-        desc: '您已经完成，正在审核中'
+        desc: '您已经完成，正在验收中'
       },
       {
         text: '其他',
@@ -255,17 +255,41 @@ Page({
         type: task2.type
       })
     } else {
-      this.setData({
-      taskID: Number(options.taskID),
-      taskReward: Number(options.taskReward),
-      taskInfo: options.taskInfo,
-      taskName: (options.type == types[0] ? "问卷任务" : "跑题任务"),
-      imageURL: (options.type == types[0]) ? task2.imageURL : task1.imageURL,
-      tags: options.tags.split(' '),
-      state: states[Number(options.state)],
-      // questionnairePath: (options.type == types[0] ? options.questionnairePath : null),
-      type: options.type
-    })
+      //默认为other
+      let taskState = states[3]
+
+      //根据taskID获取对应任务的state   
+      let statePromise = new Promise((resolve, reject) => {
+        console.log('GET /task/recipient/{taskID}')
+        console.log('options.taskID: ' + options.taskID)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?taskId=' + options.taskID + '&userId=3',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            console.log(res)
+            taskState=states[res.data[0].state]
+            resolve('ok')
+          }
+        })
+      })
+      statePromise.then((resolve)=>{
+        this.setData({
+          taskID: Number(options.taskID),
+          taskReward: Number(options.taskReward),
+          taskInfo: options.taskInfo,
+          taskName: (options.type == types[0] ? "问卷任务" : "跑题任务"),
+          imageURL: (options.type == types[0]) ? task2.imageURL : task1.imageURL,
+          tags: options.tags.split(' '),
+          state: taskState,
+          questionnairePath: (options.type == types[0] ? "pages/wjxqList/wjxqList?activityId=39109067" : null),
+          type: options.type
+        })
+      })
+
+      
     }
 
     switch (this.data.state) {

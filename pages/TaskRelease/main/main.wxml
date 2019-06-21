@@ -59,6 +59,15 @@
         required
         bind:change="onChangeTaskTags"
     />
+    <van-field wx:if="{{taskTypeSelection=='0'}}"
+        value="{{ taskQuestionID }}"
+        label="问卷ID号"
+        placeholder="填写问卷ID号，仅限问卷星系统"
+        clearable
+        size="large"
+        required
+        bind:change="onChangeTaskQuestionID"
+    />
 
     <van-cell title="任务截至时间" size='large' icon='clock-o'/>
     <van-cell title="点击选择时间(年月日时分)"  value="{{taskDDL}}" bind:click='chooseTime'/>

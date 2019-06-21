@@ -17,9 +17,9 @@
   direction="vertical"
   active-color="#f44"
 />
-<van-cell title="基本要求" size="large" label="描述信息" />
-<van-cell title="任务介绍" size="large" label="描述信息" />
-<van-cell title="评价细则" size="large" label="描述信息" />
+<van-cell title="基本要求" size="large" label="{{taskInfo}}" />
+<van-cell title="任务介绍" size="large" label="{{taskInfo}}" />
+<van-cell title="评价细则" size="large" label="{{taskInfo}}" />
 
 
 <block wx:if='{{state=="pending"}}'>
