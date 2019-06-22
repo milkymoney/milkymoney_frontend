@@ -263,14 +263,20 @@ Page({
         console.log('GET /task/recipient/{taskID}')
         console.log('options.taskID: ' + options.taskID)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?taskId=' + options.taskID + '&userId=3',
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + options.taskID + '?userId=3',
           method: 'GET',
           header: {
             'accept': 'application/json'
           },
           success(res) {
             console.log(res)
-            taskState=states[res.data[0].state]
+            if (res.data.state == null) {
+              taskState = states[3]
+            }
+            else  {
+              taskState = states[res.data.state]
+            }
+            
             resolve('ok')
           }
         })

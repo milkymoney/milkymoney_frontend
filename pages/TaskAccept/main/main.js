@@ -544,6 +544,7 @@ Page({
         _myTasks.push(task1)
         _myTasks.push(task2)
         this.setData({
+          taskList: _myTasks,
           myTasks: _myTasks,
           myPendingTasks: [],
           myDoingTasks: [],
