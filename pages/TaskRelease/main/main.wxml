@@ -15,6 +15,29 @@
     >
       <view slot="action" bind:tap="onSearch">搜索</view>
     </van-search>
+
+    <van-cell title="钱包余额"  size="large" value="{{balance}}元" icon="gold-coin-o"/>
+    <van-button size="large" type="primary" bind:click='recharge' >充值</van-button>
+
+    <van-dialog
+    use-slot
+    async-close
+    show="{{ showDialog }}"
+    show-cancel-button
+    title="{{titleDialog}}"
+    message="{{msgDialog}}"
+    transition="fade"
+    bind:close="onCloseDialog"
+    confirm-button-open-type="rechargeConfirm"
+  >
+    <van-field
+      value="{{ rechargeBalance }}"
+      label="金额"
+      border="{{ false }}"
+      placeholder="请输入充值金额"
+      bind:change="onChangeRechargeBalance"
+    />
+  </van-dialog>
   </block>
 
   <block wx:if="{{selection==1}}">
@@ -203,7 +226,7 @@
 
 <view class='bottom'>
   <van-tabbar active="{{ active }}" bind:change="onChange">
-    <van-tabbar-item icon="home-o">发布任务主页</van-tabbar-item>
+    <van-tabbar-item icon="balance-o">充值主页</van-tabbar-item>
     <van-tabbar-item icon="new-o" >发布新任务</van-tabbar-item>
     <van-tabbar-item icon="exchange" >跳至接受任务</van-tabbar-item>
     <van-tabbar-item icon="balance-list-o" >已发布任务</van-tabbar-item>

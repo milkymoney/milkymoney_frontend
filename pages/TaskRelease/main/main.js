@@ -1,5 +1,5 @@
 // pages/taskRelease/main/main.js
-
+import Dialog from '../../../dist/dialog/dialog';
 
 //submit task函数可用于后台调试
  
@@ -71,6 +71,9 @@ Page({
     // 判断提交是否为创建还是修改类型
     isModifyTask:false,
 
+    //钱包余额
+    balance:0,
+
     currentDate: new Date().getTime(),
     show: {
       middle: false,
@@ -79,9 +82,81 @@ Page({
       right: false,
       right2: false
     },
+
+    //充值对话框
+    showDialog: false,
+    rechargeBalance: 0,
+    titleDialog: '充值金额(元)',
+    msgDialog:''
   },
 
-  
+  /**
+   * 充值处理
+   */
+  recharge(){
+    //开启对话框
+    this.setData({ showDialog: true });
+  },
+
+  /**
+   * 输入充值数额
+   */
+  onChangeRechargeBalance(event){
+    this.setData({
+      rechargeBalance: event.detail
+    })
+    
+  },
+
+  /**
+   * 确认充值,确认按钮的微信开放能力，此处暂时不用
+   */
+  rechargeConfirm(){
+    
+  },
+
+  /**
+   * 关闭充值的对话窗口
+   */
+  onCloseDialog(event) {
+    console.log(event)
+    if (event.detail === 'confirm') {
+      let rechargeNum=Number(this.data.rechargeBalance)
+      if (!Number.isInteger(rechargeNum) || rechargeNum <= 0 ){
+        this.setData({
+          showDialog: false
+        });
+        wx.showToast({
+          title: '输入错误，充值失败',
+          icon: 'none'
+        })
+        return 
+      }
+
+      setTimeout(() => {
+        this.setData({
+          showDialog: false,
+          balance: this.data.balance +rechargeNum
+        });
+
+        ////////////////////////////////
+        //
+        //这里可以向服务器发送充值命令，
+        //当前金额为this.data.balance，本次充值金额为rechargeNum
+        //
+        ////////////////////////////////
+
+        wx.showToast({
+          title: '充值成功',
+          icon: 'success',
+        })
+      }, 1000);
+    } else {
+      this.setData({
+        showDialog: false
+      });
+    }
+  },
 
   /**
    * 底部弹出选择
@@ -670,6 +745,9 @@ Page({
         wx.stopPullDownRefresh()
       })
     }
+    else{
+      wx.stopPullDownRefresh()
+    }
     
   },
 
@@ -677,7 +755,7 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-
+    
   },
 
   /**
