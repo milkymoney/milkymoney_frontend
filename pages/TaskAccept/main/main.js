@@ -166,7 +166,7 @@ Page({
     if (this.sortOrderSelected =='最新发布'){
 
     } else if (this.sortOrderSelected == '离我最近'){
-
+      
     } else if (this.sortOrderSelected == '报酬最高'){
 
     }else{
