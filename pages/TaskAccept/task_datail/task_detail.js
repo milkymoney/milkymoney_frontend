@@ -9,29 +9,6 @@ import Toast from '../../../dist/toast/toast';
 
 var states = ['pending', 'doing', 'checking', 'other']
 var types = ['questionnaire', 'errand']
-var task1 = {
-  taskReward: 5,
-  taskInfo: "地点广州大学城，时间在2.29，先到先得",
-  taskName: "跑腿任务",
-  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-  tags: ["跑腿", "广州", '待审核'],
-  state: states[2],
-  taskID: '100001',
-  questionnairePath: null,
-  type: 'errand'
-}
-var task2 = {
-  taskReward: 3,
-  taskInfo: "调查问卷，关于奶牛APP的用户体验调查",
-  taskName: "问卷任务",
-  imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
-  tags: ["问卷", "调查", '待完成'],
-  state: states[1],
-  taskID: '100002',
-  questionnairePath: 'pages/wjxqList/wjxqList?activityId=39109067',
-  type: 'questionnaire'
-}
-
 
 
 Page({
@@ -81,12 +58,8 @@ Page({
   submitTask() {
     //getApp().globalData.userInfo 可以获取已经获取的用户信息
 
-    //this.data. 加上属性名字可以获取本页所有的变量，属性见上面的data:{}内部
-
-    /////////////////////////////////////////
-    //
     //接受者结算任务
-    //
+    
     console.log(this.data.images)
     console.log('POST /task/recipient/settleup/{taskId}')
     wx.uploadFile({
@@ -104,17 +77,16 @@ Page({
         console.log(res)
       }
     })
-    //
-    /////////////////////////////////////////
+    
   },
 
   /**
    * 报名活动
    */
   signUpTask() {
-    //////////////////////////////////////
-    //
+    
     //接受任务
+
     let taskPromise = new Promise((resolve, reject) => {
       console.log('POST /task/recipient/{taskId}')
       wx.request({
@@ -152,8 +124,7 @@ Page({
       console.log('接受任务')
     })
     
-    //
-    //////////////////////////////////////
+    
   },
 
 
@@ -231,72 +202,48 @@ Page({
   onLoad: function (options) {
     console.log(options)
 
-    //暂时用下面的作为效果展示，最终需要根据ID从服务端获取
-    if (options.taskID == '100001') {
-      this.setData({
-        taskReward: task1.taskReward,
-        taskInfo: task1.taskInfo,
-        taskName: task1.taskName,
-        imageURL: task1.imageURL,
-        tags: task1.tags,
-        state: task1.state,
-        questionnairePath: task1.questionnairePath,
-        type: task1.type
-      })
-    } else if (options.taskID == '100002') {
-      this.setData({
-        taskReward: task2.taskReward,
-        taskInfo: task2.taskInfo,
-        taskName: task2.taskName,
-        imageURL: task2.imageURL,
-        state: task2.state,
-        tags: task2.tags,
-        questionnairePath: task2.questionnairePath,
-        type: task2.type
-      })
-    } else {
-      //默认为other
-      let taskState = states[3]
+    //默认为other
+    let taskState = states[3]
 
-      //根据taskID获取对应任务的state   
-      let statePromise = new Promise((resolve, reject) => {
-        console.log('GET /task/recipient/{taskID}')
-        console.log('options.taskID: ' + options.taskID)
-        wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + options.taskID + '?userId=3',
-          method: 'GET',
-          header: {
-            'accept': 'application/json'
-          },
-          success(res) {
-            console.log(res)
-            if (res.data.state == null) {
-              taskState = states[3]
-            }
-            else  {
-              taskState = states[res.data.state]
-            }
-            
-            resolve('ok')
+    //根据taskID获取对应任务的state   
+    let statePromise = new Promise((resolve, reject) => {
+      console.log('GET /task/recipient/{taskID}')
+      console.log('options.taskID: ' + options.taskID)
+      wx.request({
+        url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + options.taskID + '?userId=3',
+        method: 'GET',
+        header: {
+          'accept': 'application/json'
+        },
+        success(res) {
+          console.log(res)
+          if (res.data.state == null) {
+            taskState = states[3]
           }
-        })
+          else  {
+            taskState = states[res.data.state]
+          }
+          
+          resolve('ok')
+        }
       })
-      statePromise.then((resolve)=>{
-        this.setData({
-          taskID: Number(options.taskID),
-          taskReward: Number(options.taskReward),
-          taskInfo: options.taskInfo,
-          taskName: (options.type == types[0] ? "问卷任务" : "跑题任务"),
-          imageURL: (options.type == types[0]) ? task2.imageURL : task1.imageURL,
-          tags: options.tags.split(' '),
-          state: taskState,
-          questionnairePath: (options.type == types[0] ? "pages/wjxqList/wjxqList?activityId=39109067" : null),
-          type: options.type
-        })
+    })
+    statePromise.then((resolve)=>{
+      this.setData({
+        taskID: Number(options.taskID),
+        taskReward: Number(options.taskReward),
+        taskInfo: options.taskInfo,
+        taskName: (options.type == types[0] ? "问卷任务" : "跑题任务"),
+        imageURL: (options.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+        tags: options.tags.split(' '),
+        state: taskState,
+        questionnairePath: (options.type == types[0] ? "pages/wjxqList/wjxqList?activityId=39109067" : null),
+        type: options.type
       })
+    })
 
       
-    }
+    
 
     switch (this.data.state) {
       case states[0]: {

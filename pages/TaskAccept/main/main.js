@@ -1,24 +1,7 @@
 // pages/TaskAccept/main/main.js
 var states=['pending','doing','checking','other']
 var types = ['questionnaire', 'errand']
-var task1 = {
-  taskReward: 5,
-  taskInfo: "地点广州大学城，时间在2.29，先到先得",
-  taskName: "跑腿任务",
-  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-  tags: ["跑腿", "广州",'待验收'],
-  state:states[2],
-  taskID:'100001'
-}
-var task2 = {
-  taskReward: 3,
-  taskInfo: "调查问卷，关于奶牛APP的用户体验调查",
-  taskName: "问卷任务",
-  imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
-  tags: ["问卷", "调查",'待完成'],
-  state:states[1],
-  taskID:'100002'
-}
+
 
 Page({
 
@@ -191,8 +174,6 @@ Page({
 
     }
 
-
-
   },
 
   /**
@@ -216,9 +197,6 @@ Page({
     }
 
   },
-
-
-
 
   /**
    * 搜索函数
@@ -331,10 +309,7 @@ Page({
     }
     let taskListPre = this.data.taskList
 
-    //////////////////////////
-    //
     //将获取到的任务push进taskListPre
-    //
     let taskPromise = new Promise((resolve, reject) => {
       console.log('GET /task')
       console.log('search main value: ' + this.data.search_value_main)
@@ -371,13 +346,9 @@ Page({
           
       })
     })
-    // 
-    //
-    ////////////////////////////
-    
+
     taskPromise.then((resolve) =>{
-      taskListPre.push(task1)
-      taskListPre.push(task2)
+
 
       this.setData({
         taskList: taskListPre,
@@ -439,10 +410,8 @@ Page({
       //下拉刷新所有的可见已发布任务
       let _taskList=[]
 
-      ////////////////////////
-      //
       //将获取到的所有已发布任务装入_taskList
-      //
+    
 
       let taskPromise=new Promise( (resolve,reject)=>{
         console.log('GET /task')
@@ -476,13 +445,8 @@ Page({
           }
         })
       } )
-      
-      //
-      //////////////////////////
-
       taskPromise.then( (resolve)=>{
-        _taskList.push(task1)
-        _taskList.push(task2)
+   
         this.setData({
           taskList: _taskList
         })
@@ -491,17 +455,12 @@ Page({
         console.log(_taskList)
 
       } )
-      
-
 
     }else if(this.data.selection==3){
       //下拉刷新自己已接受的任务袋
       let _myTasks=[]
 
-      //////////////////////////
-      //
       //将获取到的自己接收到的放入_myTasks
-      //
 
       let taskPromise=new Promise((resolve,reject)=>{
         console.log('GET /task/recipient')
@@ -537,12 +496,9 @@ Page({
           }
         })
       })
-      
-      //
-      //////////////////////////
+     
       taskPromise.then( (resolve)=>{
-        _myTasks.push(task1)
-        _myTasks.push(task2)
+     
         this.setData({
           taskList: _myTasks,
           myTasks: _myTasks,

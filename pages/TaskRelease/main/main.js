@@ -7,24 +7,7 @@ import Dialog from '../../../dist/dialog/dialog';
 var states = ['pending', 'doing', 'finished']
 var types = ['questionnaire', 'errand']
 
-var task1 = {
-  taskReward: 5,
-  taskInfo: "地点广州大学城，时间在2.29，先到先得",
-  taskName: "跑腿任务",
-  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-  tags: ["跑腿", "广州", '进行中'],
-  state: states[1],
-  taskID: '100001'
-}
-var task2 = {
-  taskReward: 3,
-  taskInfo: "调查问卷，关于奶牛APP的用户体验调查",
-  taskName: "问卷任务",
-  imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
-  tags: ["问卷", "调查", '进行中'],
-  state: states[1],
-  taskID: '100002'
-}
+
 
 Page({
 
@@ -133,24 +116,53 @@ Page({
         return 
       }
 
-      setTimeout(() => {
-        this.setData({
-          showDialog: false,
-          balance: this.data.balance +rechargeNum
-        });
+      let balance=this.data.balance
 
-        ////////////////////////////////
-        //
+      new Promise((resolve,reject)=>{
+
         //这里可以向服务器发送充值命令，
         //当前金额为this.data.balance，本次充值金额为rechargeNum
-        //
-        ////////////////////////////////
 
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/user/balance?userId=2',
+          method: 'PUT',
+          header: {
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          data: {
+            "recharge":rechargeNum
+          },
+          success(res) {
+            console.log(res)
+            resolve(res)
+          }
+        })
+      }).then((res)=>{
+        return new Promise((resolve,reject)=>{
+          wx.request({
+            url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+            method: 'GET',
+            header: {
+              'accept': 'application/json'
+            },
+            success(res) {
+              balance = res.data.balance
+              resolve('ok')
+            }
+          })
+        })
+      }).then((res)=>{
+        this.setData({
+          showDialog: false,
+          balance: balance
+        });
         wx.showToast({
           title: '充值成功',
           icon: 'success',
         })
-      }, 1000);
+      })
+ 
     } else {
       this.setData({
         showDialog: false
@@ -162,20 +174,23 @@ Page({
    * 底部弹出选择
    */
   onTransitionEnd() {
-    //console.log(`You can't see me 🌚`);
   },
+
   toggle(type) {
     this.setData({
       [`show.${type}`]: !this.data.show[type],
       selectedInfo: this.data.areaSelected + " " + this.data.taskTypeSelected + " " + this.data.sortOrderSelected,
     });
   },
+
   toggleBottomPopup() {
     this.toggle('bottom');
   },
+
   onCancel() {
     this.toggleBottomPopup()
   },
+
   onConfirmDDL(event) {
     const { detail, currentTarget } = event;
     const date = new Date(detail);
@@ -238,14 +253,6 @@ Page({
     /////////////////////////
     //
     //这里可以发布新任务，也是修改任务的地方
-    //可用的变量：使用例子：this.data.taskTypeSelection
-    //taskTypeSelection:'0',
-    //taskDDL:'',
-    //taskReward:0,
-    //taskName:'',
-    //taskInfo:'',
-    //tags:'',
-    //taskMaxAccept:0,
     //
 
     if (!this.data.isModifyTask) {
@@ -358,7 +365,6 @@ Page({
         }
       })
     }
-    /////////////////////////
     
     console.log('提交审核')
   },
@@ -576,11 +582,11 @@ Page({
       })
 
     } else {
+      let balance=this.data.balance
       let taskListPre = this.data.taskList
-    ///////////////////////////////////////
-    //
+
     //将获取到的任务装入taskListPre
-    //
+
     let taskPromise = new Promise((resolve, reject) => {
       console.log('GET /task/publisher')
       console.log('search_value: ' + this.data.search_value)
@@ -613,28 +619,47 @@ Page({
         }
       })
     })
-    //
-    ////////////////////////////////////////
-    taskPromise.then((resolve) => {
-      taskListPre.push(task1)
-      taskListPre.push(task2)
+    taskPromise.then((res) => {
+      return new Promise((resolve,reject)=>{
 
+        //获取账户余额
+
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            balance=res.data.balance
+            resolve('ok')
+          }
+        })
+
+      })
+
+    }).then((res)=>{
+      
       this.setData({
         taskList: taskListPre,
         userInfo: getApp().globalData.userInfo,
         myPendingTasks: [],
         myDoingTasks: [],
         myFinishedTasks: [],
-        isModifyTask: false
+        isModifyTask: false,
+        balance:balance
       })
 
-      console.log(resolve)
+      
       console.log(taskListPre)
 
       this.preparePendingTasks()
       this.prepareDoingTasks()
       this.prepareFinishedTasks()
+      
+
     })
+
     }
 
     
@@ -681,14 +706,13 @@ Page({
       //在标题栏中显示加载
       wx.showNavigationBarLoading()
 
+
       //这里增加刷新函数
       let taskList=[]
+      let balance=this.data.balance
 
-      ///////////////////////////
-      //
       //将获取到的push到taskList
-      //
-      let taskPromise=new Promise((resolve,reject)=>{
+      new Promise((resolve,reject)=>{
         console.log('GET /task/publisher')
         console.log('search_value: ' + this.data.search_value)
         wx.request({
@@ -719,21 +743,31 @@ Page({
             resolve('null')
           }
         })
-      })
-      
-      // 
-      ///////////////////////////
-      taskPromise.then((resolve)=>{
-        taskList.push(task1)
-        taskList.push(task2)
+      }).then((res)=>{
+        return new Promise((resolve,reject)=>{
+          wx.request({
+            url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+            method: 'GET',
+            header: {
+              'accept': 'application/json'
+            },
+            success(res) {
+              balance = res.data.balance
+              resolve('ok')
+            }
+          })
+        })
+      }).then((res)=>{
+        
         this.setData({
           taskList: taskList,
           myPendingTasks: [],
           myDoingTasks: [],
           myFinishedTasks: [],
-          isModifyTask: false
+          isModifyTask: false,
+          balance:balance
         })
-        console.log(resolve)
+        console.log(res)
         console.log(taskList)
 
         this.preparePendingTasks()

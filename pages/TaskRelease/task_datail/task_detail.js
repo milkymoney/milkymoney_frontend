@@ -1,4 +1,3 @@
-
 // pages/task_datail/task_detail.js
 
 import Dialog from '../../../dist/dialog/dialog';
@@ -10,32 +9,6 @@ var types = ['questionnaire', 'errand']
 
 //暂时采用下面的数据模拟
 
-var task1 = {
-  taskReward: 5,
-  taskInfo: "地点广州大学城，时间在2.29，先到先得",
-  taskName: "跑腿任务",
-  imageURL: "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
-  tags: ["跑腿", "广州", '进行中'],
-  state: states[1],
-  taskID: '100001',
-  taskTypeSelection: '1',
-  taskDDL: '2019/10/1 下午10:00:00',
-  taskMaxAccept: 5,
-  type: 'errand'
-}
-var task2 = {
-  taskReward: 3,
-  taskInfo: "调查问卷，关于奶牛APP的用户体验调查",
-  taskName: "问卷任务",
-  imageURL: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg",
-  tags: ["问卷", "调查", '进行中'],
-  state: states[1],
-  taskID: '100002',
-  taskTypeSelection: '0',
-  taskDDL: '2019/7/1 上午8:00:00',
-  taskMaxAccept: 15,
-  type: 'questionnaire'
-}
 
 var user1_data = {
 
@@ -162,7 +135,7 @@ Page({
           url: '../main/main',
           success: () => {
             wx.showToast({
-              title: resolve.message,
+              title: '删除成功',
               icon: 'success',
               duration: 2000,
             })
@@ -238,9 +211,6 @@ Page({
    * 验收单个
    */
   onChangeChecked(event) {
-    //console.log(event.target.dataset)
-
-    //console.log(event.detail)
 
     const userID = event.target.dataset.userid
     const checkType = event.target.dataset.checktype
@@ -257,7 +227,6 @@ Page({
         isUnPass: isUnPassTemp
       })
 
-      //console.log(isPassTemp)
     } else {
       //unPassed
       let isUnPassTemp = this.data.isUnPass
@@ -271,9 +240,6 @@ Page({
         checked_all: 0
       })
     }
-
-
-
 
   },
 
@@ -307,7 +273,6 @@ Page({
    * 处理点击图片预览
    */
   handleImagePreview(e) {
-    //console.log(e)
 
     const url = e.target.dataset.url
     wx.previewImage({
@@ -325,7 +290,6 @@ Page({
     this.showCustomDialog()
 
     console.log('验收提交')
-
 
     let usersDataTemp = this.data.usersData
     //提交之后刷新页面
@@ -444,11 +408,7 @@ Page({
       })
     })
 
-
-    /////////////////////////
-    //
     //根据taskID获取本页面的任务内容（不包括验收内容）
-    //
     let taskPromise2 = new Promise((resolve, reject) => {
       console.log('GET /task/publisher/{taskId}')
       wx.request({
@@ -466,47 +426,20 @@ Page({
 
     taskPromise2.then((resolve) => {
 
-      if (this.data.taskID == '100001') {
-        this.setData({
-          taskReward: task1.taskReward,
-          taskInfo: task1.taskInfo,
-          taskName: task1.taskName,
-          imageURL: task1.imageURL,
-          tags: task1.tags,
-          state: task1.state,
-          type: task1.type,
-          taskTypeSelection: task1.taskTypeSelection,
-          taskDDL: task1.taskDDL,
-          taskMaxAccept: task1.taskMaxAccept,
-        })
-
-      } else if (this.data.taskID == '100002') {
-        this.setData({
-          taskReward: task2.taskReward,
-          taskInfo: task2.taskInfo,
-          taskName: task2.taskName,
-          imageURL: task2.imageURL,
-          state: task2.state,
-          tags: task2.tags,
-          type: task2.type,
-          taskTypeSelection: task2.taskTypeSelection,
-          taskDDL: task2.taskDDL,
-          taskMaxAccept: task2.taskMaxAccept,
-        })
-      } else {
-        this.setData({
-          taskReward: resolve.reward,
-          taskInfo: resolve.description,
-          taskName: (resolve.type == types[0]) ? "问卷任务" : "跑腿任务",
-          imageURL: (resolve.type == types[0]) ? task2.imageURL : task1.imageURL,
-          tags: resolve.label.split(' '),
-          state: states[resolve.state - 4],
-          type: resolve.type,
-          taskTypeSelection: (resolve.type == types[0] ? "0" : "1"),
-          taskDDL: resolve.deadline,
-          taskMaxAccept: resolve.maxAccept
-        })
-      }
+     
+      this.setData({
+        taskReward: resolve.reward,
+        taskInfo: resolve.description,
+        taskName: (resolve.type == types[0]) ? "问卷任务" : "跑腿任务",
+        imageURL: (resolve.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
+        tags: resolve.label.split(' '),
+        state: states[resolve.state - 4],
+        type: resolve.type,
+        taskTypeSelection: (resolve.type == types[0] ? "0" : "1"),
+        taskDDL: resolve.deadline,
+        taskMaxAccept: resolve.maxAccept
+      })
+      
 
       switch (this.data.state) {
         case states[0]: {
@@ -529,8 +462,6 @@ Page({
         }
       }
     })
-    //
-    /////////////////////////
 
   },
 
