@@ -5,6 +5,7 @@
     <!--左上角定位，由于小程序只能获取经纬度，城市需要向第三方地图获取，所以该功能在以后迭代再完善-->
     <van-cell title="{{location_city}}" icon="location-o" />
     <!--搜索框-->
+    <!--
     <van-search
       value="{{ search_value }}"
       placeholder="请输入搜索关键词"
@@ -15,6 +16,7 @@
     >
       <view slot="action" bind:tap="onSearch">搜索</view>
     </van-search>
+    -->
 
     <van-cell title="钱包余额"  size="large" value="{{balance}}元" icon="gold-coin-o"/>
     <van-button size="large" type="primary" bind:click='recharge' >充值</van-button>
@@ -127,6 +129,7 @@
   <block wx:if="{{selection==3}}">
     <!--已发布任务列表-->
     <!--已发布任务列表内搜索-->
+    <!--
     <van-search
       value="{{ search_value_personal }}"
       placeholder="请输入个人任务关键词"
@@ -137,6 +140,8 @@
     >
       <view slot="action" bind:tap="onSearchPersonalTask">搜索</view>
     </van-search>
+    -->
+    <van-cell title="发布任务界面" icon='balance-list-o' size="large" />
 
     <van-tabs active="{{ 1 }}" bind:change="onChangeTab">
       <van-tab title="待审核">

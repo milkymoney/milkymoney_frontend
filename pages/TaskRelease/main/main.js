@@ -30,7 +30,9 @@ Page({
     search_value:'',
 
     //待审核，进行中，已完成
+    //taskList用来存放未被分类的任务
     taskList: [],
+
     myPendingTasks: [],
     myDoingTasks: [],
     myFinishedTasks: [],
@@ -56,6 +58,9 @@ Page({
 
     //钱包余额
     balance:0,
+
+    //当前页数
+    currentPage:0,
 
     currentDate: new Date().getTime(),
     show: {
@@ -250,10 +255,7 @@ Page({
       return
     }
     
-    /////////////////////////
-    //
     //这里可以发布新任务，也是修改任务的地方
-    //
 
     if (!this.data.isModifyTask) {
       let taskPromise = new Promise((resolve, reject) => {
@@ -288,7 +290,7 @@ Page({
         if (resolve.success) {
           //完成发布或者修改
           wx.showToast({
-            title: resolve.message, // '已发布成功/修改'
+            title: '发布成功', // '已发布成功/修改'
             icon: 'success',
             duration: 2000,
             success: () => {
@@ -302,7 +304,7 @@ Page({
           })
         } else {
           wx.showToast({
-            title: resolve.message,
+            title: '发布失败',
             icon: 'none',
             duration: 2000,
           })
@@ -344,7 +346,7 @@ Page({
         if (resolve.success) {
           //完成发布或者修改
           wx.showToast({
-            title: resolve.message, // '已发布成功/修改'
+            title: '修改成功', // '已发布成功/修改'
             icon: 'success',
             duration: 2000,
             success: () => {
@@ -358,7 +360,7 @@ Page({
           })
         } else {
           wx.showToast({
-            title: resolve.message,
+            title: '修改失败',
             icon: 'none',
             duration: 2000,
           })
@@ -485,23 +487,7 @@ Page({
    * 切换任务袋的tab
    */
   onChangeTab(event) {
-    //这里未完成，以后需要从服务端获取对应的个人任务
-    this.setData({
-      myPendingTasks: [],
-      myDoingTasks: [],
-      myFinishedTasks: [],
-    })
-
-    if (event.detail.index == 0) {
-      //待审核
-      this.preparePendingTasks()
-    } else if (event.detail.index == 1) {
-      //进行中
-      this.prepareDoingTasks()
-    } else if (event.detail.index == 2) {
-      //已完成
-      this.prepareFinishedTasks()
-    } 
+   
   },
 
   preparePendingTasks() {
@@ -510,7 +496,7 @@ Page({
       if (task.state == states[0]) {
         listTemp.push(task)
         this.setData({
-          myPendingTasks: listTemp
+          myPendingTasks: listTemp,
         })
       }
     })
@@ -521,7 +507,7 @@ Page({
       if (task.state == states[1] || !task.state) {
         listTemp.push(task)
         this.setData({
-          myDoingTasks: listTemp
+          myDoingTasks: listTemp,
         })
       }
     })
@@ -532,7 +518,7 @@ Page({
       if (task.state == states[2]) {
         listTemp.push(task)
         this.setData({
-          myFinishedTasks: listTemp
+          myFinishedTasks: listTemp,
         })
       }
     })
@@ -561,7 +547,7 @@ Page({
 
   /**
    * 生命周期函数--监听页面加载
-   * 将获取到的任务装入taskListPre
+   * 将获取到的任务装入taskList
    */
   onLoad: function (options) {
     //处理修改任务的跳转
@@ -578,14 +564,15 @@ Page({
         selection: 1,
         active: 1,
         taskID: info.taskID,
-        isModifyTask:true
+        isModifyTask:true,
+        currentPage:0
       })
 
     } else {
       let balance=this.data.balance
-      let taskListPre = this.data.taskList
+      let taskList = this.data.taskList
 
-    //将获取到的任务装入taskListPre
+    //将获取到的任务装入taskList
 
     let taskPromise = new Promise((resolve, reject) => {
       console.log('GET /task/publisher')
@@ -611,7 +598,7 @@ Page({
                 state: states[atask.state - 4],
                 taskID: atask.tid
               }
-              taskListPre.push(_atask)
+              taskList.push(_atask)
             })
             resolve('ok')
           }
@@ -641,22 +628,25 @@ Page({
     }).then((res)=>{
       
       this.setData({
-        taskList: taskListPre,
+        taskList: taskList,
         userInfo: getApp().globalData.userInfo,
         myPendingTasks: [],
         myDoingTasks: [],
         myFinishedTasks: [],
         isModifyTask: false,
-        balance:balance
+        balance:balance,
+        currentPage: 0
       })
 
       
-      console.log(taskListPre)
+      console.log(taskList)
 
       this.preparePendingTasks()
       this.prepareDoingTasks()
       this.prepareFinishedTasks()
-      
+      this.setData({
+        taskList: []
+      })
 
     })
 
@@ -708,7 +698,7 @@ Page({
 
 
       //这里增加刷新函数
-      let taskList=[]
+      let taskList = this.data.taskList
       let balance=this.data.balance
 
       //将获取到的push到taskList
@@ -761,11 +751,12 @@ Page({
         
         this.setData({
           taskList: taskList,
+          isModifyTask: false,
+          balance:balance,
           myPendingTasks: [],
           myDoingTasks: [],
           myFinishedTasks: [],
-          isModifyTask: false,
-          balance:balance
+          currentPage: 0
         })
         console.log(res)
         console.log(taskList)
@@ -773,7 +764,9 @@ Page({
         this.preparePendingTasks()
         this.prepareDoingTasks()
         this.prepareFinishedTasks()
-
+        this.setData({
+          taskList: []
+        })
         //加载完成
         wx.hideNavigationBarLoading()
         wx.stopPullDownRefresh()
@@ -789,6 +782,73 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
+    
+    let taskList=this.data.taskList
+
+    if (this.data.selection == 3) {
+      wx.showNavigationBarLoading()
+      //加载下一页
+      new Promise((resolve, reject) => {
+        console.log('GET /task/publisher')
+        console.log('search_value: ' + this.data.search_value)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page='+(this.data.currentPage+1)+'&keyword=' + this.data.search_value + '&userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            console.log(res)
+            if (Array.isArray(res.data)) {
+              res.data.forEach(function (atask) {
+                let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+                let _atask = {
+                  taskReward: atask.reward,
+                  taskInfo: atask.description,
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
+                  tags: taskTag,
+                  state: states[atask.state - 4],
+                  taskID: atask.tid,
+                }
+                taskList.push(_atask)
+              })
+              resolve('ok')
+            }else{
+              //无更多页
+              wx.showToast({
+                title: '无更多任务!',
+                icon: 'none',
+                duration: 2000,
+              })
+              resolve('null')
+            }
+            
+          }
+        })
+      }).then((res) => {
+
+        this.setData({
+          taskList: taskList,
+          currentPage: res == 'ok' ? this.data.currentPage + 1 : this.data.currentPage
+        })
+        console.log(res)
+
+        this.preparePendingTasks()
+        this.prepareDoingTasks()
+        this.prepareFinishedTasks()
+        this.setData({
+          taskList: []
+        })
+        //加载完成
+        wx.hideNavigationBarLoading()
+        wx.stopPullDownRefresh()
+      })
+    } 
+    else {
+      wx.stopPullDownRefresh()
+    }
     
   },
 

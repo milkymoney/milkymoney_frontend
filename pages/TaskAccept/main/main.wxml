@@ -9,7 +9,7 @@
     <!--搜索框-->
     <van-search
       value="{{ search_value_main }}"
-      placeholder="请输入搜索关键词"
+      placeholder="请输入搜索任务标签关键词"
       use-action-slot
       bind:change="onChangeMain"
       bind:search="onSearchMain"
@@ -43,7 +43,7 @@
     <!--搜索框-->
     <van-search
       value="{{ search_value_main }}"
-      placeholder="请输入搜索关键词"
+      placeholder="请输入搜索任务标签关键词"
       use-action-slot
       bind:change="onChangeMain"
       bind:search="onSearchMain"
@@ -129,6 +129,7 @@
   <block wx:if="{{selection==3}}">
     <!--任务袋-->
     <!--任务袋内搜索框-->
+    <!--
     <van-search
       value="{{ search_value_personal }}"
       placeholder="请输入个人任务关键词"
@@ -139,7 +140,8 @@
     >
       <view slot="action" bind:tap="onSearchPersonalTask">搜索</view>
     </van-search>
-
+    -->
+    <van-cell title="接受任务界面" icon='balance-list-o' size="large" />
     <van-tabs active="{{ 1 }}" bind:change="onChangeTab">
       <van-tab title="待审核">
         <view wx:for='{{myPendingTasks}}' wx:key="taskID">
