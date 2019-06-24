@@ -246,7 +246,7 @@ Page({
       })
       return
     }
-    if (!Number.isInteger(this.data.taskQuestionID) ){
+    if (!Number.isInteger(Number(this.data.taskQuestionID)) ){
       wx.showToast({
         title: '问卷ID必须为数字类型!',
         icon: 'none',
