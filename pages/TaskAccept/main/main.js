@@ -64,26 +64,36 @@ Page({
     console.log(this.data.myDoingTasks)
     let selectedTask = {}
     
-    this.data.myPendingTasks.forEach(function(atask) {
-      if (atask.taskID == event.target.id) {
-        selectedTask = atask
-      }
-    })
-    this.data.myDoingTasks.forEach(function (atask) {
-      if (atask.taskID == event.target.id) {
-        selectedTask = atask
-      }
-    })
-    this.data.myCheckingTasks.forEach(function (atask) {
-      if (atask.taskID == event.target.id) {
-        selectedTask = atask
-      }
-    })
-    this.data.myOtherTasks.forEach(function (atask) {
-      if (atask.taskID == event.target.id) {
-        selectedTask = atask
-      }
-    })
+    if(this.data.selection==3){
+      this.data.myPendingTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+      this.data.myDoingTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+      this.data.myCheckingTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+      this.data.myOtherTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+    }else{
+      this.data.taskList.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+    }
+
+    
 
     console.log(selectedTask)
     if (Array.isArray(selectedTask.tags)){
