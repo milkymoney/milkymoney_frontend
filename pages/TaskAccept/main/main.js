@@ -643,13 +643,21 @@ Page({
                 _myTasks.push(_atask)
               })
               resolve('ok')
+            }else{
+              resolve('null')
             }
-            resolve('null')
+            
             
           }
         })
-      }).then( (resolve)=>{
-     
+      }).then( (res)=>{
+        if (res == 'null') {
+          wx.showToast({
+            title: '无相关内容',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
         this.setData({
           taskList: _myTasks,
           myTasksTemp: _myTasks,
@@ -659,7 +667,7 @@ Page({
           myOtherTasks: [],
           currentMyTasksPage: 0,
         })
-        console.log(resolve)
+        console.log(res)
         console.log(_myTasks)
 
         this.preparePendingTasks()
