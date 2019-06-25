@@ -290,6 +290,10 @@ Page({
     this.showCustomDialog()
 
     console.log('验收提交')
+    let uncheckedUsers = []
+    let passedUsers = []
+    let unpassedUsers = []
+    let users = [[], [], []]
 
     let usersDataTemp = this.data.usersData
     //提交之后刷新页面
@@ -298,11 +302,21 @@ Page({
       if (usersDataTemp[i].state == checkState[0]) {
         if (this.data.isPass[i]) {
           usersDataTemp[i].state = checkState[1]
+          users[1].push(usersDataTemp[i].userID)
         } else if (this.data.isUnPass[i]) {
           usersDataTemp[i].state = checkState[2]
+          users[2].push(usersDataTemp[i].userID)
+        } else {
+          users[0].push(usersDataTemp[i].userID)
         }
+      } else if (usersDataTemp[i].state == checkState[1]) {
+        users[1].push(usersDataTemp[i].userID)
+      } else if (usersDataTemp[i].state == checkState[2]) {
+        users[2].push(usersDataTemp[i].userID)
       }
     }
+
+    console.log(usersDataTemp)
 
     ////////////////////////////////
     //
@@ -311,24 +325,26 @@ Page({
     //{  userID: 用户ID,
     //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
     // }
-    // console.log('POST /task/publisher/confirm/{taskId}')
-    // wx.request({
-    //   url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + taskId,
-    //   method: 'POST',
-    //   header: {
-    //     'accept': 'application/json',
-    //     'content-type': 'application/json'
-    //   },
-    //   body: {
-    //     'confirm': true,				// boolean
-    //     'users': [							// list of integer
-    //       0, 1, 5
-    //     ]
-    //   },
-    //   success(res) {
-    //     console.log(res)
-    //   }
-    // })
+    let taskPromise = new Promise((resolve, reject) => {
+      console.log('POST /task/publisher/confirm/{taskId}')
+      for(var i = 0; i < 3; ++i) {
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID + '?userId=2',
+          method: 'POST',
+          header: {
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          data: {
+            'checkState': checkState[i],
+            'users': users[i]
+          },
+          success(res) {
+            console.log(res)
+          }
+        })
+      }
+    })
     //
     ////////////////////////////////
 
@@ -369,9 +385,9 @@ Page({
       if (Array.isArray(resolve)) {
         resolve.forEach(function(user_info) {
           let user_data = {
-            // state: ,
+            state: user_info.checkState,
             userID: user_info.id,
-            imageURL: user_info.Proves
+            imageURL: user_info.proves
           }
           usersDataTemp.push(user_data)
         })

@@ -69,7 +69,6 @@ Page({
 
     wx.navigateTo({
       url: '../task_datail/task_detail?taskID=' + selectedTask.taskID 
-                      + '&state=' + selectedTask.state 
                       + '&tags=' + selectedTask.tags 
                       + '&taskReward=' + selectedTask.taskReward
                       + '&taskInfo=' + selectedTask.taskInfo
@@ -300,75 +299,77 @@ Page({
    * 将获取到的任务push进taskListPre
    */
   onLoad: function (options) {
+    console.log(options)
     if (options.selection != null) {
       this.setData({
         selection: options.selection,
         active: options.selection
       })
       this.onPullDownRefresh()
-    }
-    let taskListPre = this.data.taskList
+    } else {
+      let taskListPre = this.data.taskList
 
-    //将获取到的任务push进taskListPre
-    let taskPromise = new Promise((resolve, reject) => {
-      console.log('GET /task')
-      console.log('search main value: ' + this.data.search_value_main)
-      wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
-        method: 'GET',
-        header: {
-          'accept': 'application/json'
-        },
-        success(res) {
-          console.log(res)
-          if (res.data != null){
-            res.data.forEach(function (atask) {
-              
-              let taskTag = atask.label.split(" ")
-              let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
-              let _atask = {
-                taskReward: atask.reward,
-                taskInfo: atask.description,
-                type: atask.type,
-                taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
-                imageURL: imgURL,
-                state: atask.state,
-                tags: taskTag,
-                taskID: atask.tid
-              }
-              taskListPre.push(_atask)
-            })
-            resolve('ok')
+      //将获取到的任务push进taskListPre
+      let taskPromise = new Promise((resolve, reject) => {
+        console.log('GET /task')
+        console.log('search main value: ' + this.data.search_value_main)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            console.log(res)
+            if (res.data != null) {
+              res.data.forEach(function (atask) {
+
+                let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+                let _atask = {
+                  taskReward: atask.reward,
+                  taskInfo: atask.description,
+                  type: atask.type,
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
+                  state: atask.state,
+                  tags: taskTag,
+                  taskID: atask.tid
+                }
+                taskListPre.push(_atask)
+              })
+              resolve('ok')
+            }
+            resolve('null')
           }
-          resolve('null')
-        }
-          
-          
-      })
-    })
-
-    taskPromise.then((resolve) =>{
 
 
-      this.setData({
-        taskList: taskListPre,
-        userInfo: getApp().globalData.userInfo,
-        myTasks: taskListPre,
-        myPendingTasks: [],
-        myDoingTasks: [],
-        myCheckingTasks: [],
-        myOtherTasks: []
+        })
       })
 
-      console.log(resolve)
-      console.log(taskListPre)
+      taskPromise.then((resolve) => {
 
-      this.preparePendingTasks()
-      this.prepareDoingTasks()
-      this.prepareCheckingTasks()
-      this.prepareOtherTasks()
-    })
-    
+
+        this.setData({
+          taskList: taskListPre,
+          userInfo: getApp().globalData.userInfo,
+          myTasks: taskListPre,
+          myPendingTasks: [],
+          myDoingTasks: [],
+          myCheckingTasks: [],
+          myOtherTasks: []
+        })
+
+        console.log(resolve)
+        console.log(taskListPre)
+
+        this.preparePendingTasks()
+        this.prepareDoingTasks()
+        this.prepareCheckingTasks()
+        this.prepareOtherTasks()
+      })
+
+    }
   },
 
   /**

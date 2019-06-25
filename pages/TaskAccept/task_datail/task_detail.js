@@ -57,24 +57,67 @@ Page({
    */
   submitTask() {
     //getApp().globalData.userInfo 可以获取已经获取的用户信息
+    
+    if (this.data.images.length == 0) {
+      wx.showToast({
+        title: '上传至少一张截图!',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
 
     //接受者结算任务
-    
     console.log(this.data.images)
-    console.log('POST /task/recipient/settleup/{taskId}')
-    wx.uploadFile({
-      // url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID + '?userId=2',
-      url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/1?userId=2',
-      filePath: this.data.images[0],
-      name: 'proveImages',
-      formData: {
-        user: 2
-      },
-      header: {
-        'accept': 'application/json'
-      },
-      success(res) {
-        console.log(res)
+    let taskPromise = new Promise((resolve, reject) => {
+      console.log('POST /task/recipient/settleup/{taskId}')
+      let failed = []
+      wx.showToast({
+        title: '图片上传中',
+        icon: 'loading',
+        duration: 10000
+      })
+      for (var imgIndex = 0; imgIndex < this.data.images.length; ++imgIndex) {
+        wx.uploadFile({
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID + '?userId=3',
+          filePath: this.data.images[imgIndex],
+          name: 'myfile',
+          formData: {
+            user: 3
+          },
+          header: {
+            'accept': 'application/json',
+          },
+          success(res) {
+            let data = JSON.parse(res.data)
+            if (!data.success) {
+              failed.push(String(imgIndex))
+            }
+            console.log(data)
+            resolve(failed)
+          }
+        })
+      }
+    })
+
+    taskPromise.then((resolve) => {
+      if (resolve.length == 0) {
+        wx.navigateTo({
+          url: '../main/main?selection=3',
+          success: () => {
+            wx.showToast({
+              title: '图片上传成功',
+              icon: 'success',
+              duration: 2000
+            })
+          }
+        })
+      } else {
+        wx.showToast({
+          title: '图片' + resolve.join(',') + '上传失败',
+          icon: 'none',
+          duration: 2000
+        })
       }
     })
     
@@ -155,6 +198,7 @@ Page({
    * 上传截图
    */
   uploadImage() {
+    
     wx.chooseImage({
       sizeType: ['original', 'compressed'],  //可选择原图或压缩后的图片
       sourceType: ['album', 'camera'], //可选择性开放访问相册、相机
@@ -229,6 +273,7 @@ Page({
       })
     })
     statePromise.then((resolve)=>{
+      console.log(taskState)
       this.setData({
         taskID: Number(options.taskID),
         taskReward: Number(options.taskReward),
@@ -240,39 +285,36 @@ Page({
         questionnairePath: (options.type == types[0] ? "pages/wjxqList/wjxqList?activityId=39109067" : null),
         type: options.type
       })
+
+      switch (this.data.state) {
+        case states[0]: {
+          this.setData({
+            active: 0
+          })
+          break
+        }
+        case states[1]: {
+          this.setData({
+            active: 1
+          })
+          break
+        }
+        case states[2]: {
+          this.setData({
+            active: 2
+          })
+          break
+        }
+        case states[3]: {
+          this.setData({
+            active: 3
+          })
+          break
+        }
+
+
+      }
     })
-
-      
-    
-
-    switch (this.data.state) {
-      case states[0]: {
-        this.setData({
-          active: 0
-        })
-        break
-      }
-      case states[1]: {
-        this.setData({
-          active: 1
-        })
-        break
-      }
-      case states[2]: {
-        this.setData({
-          active: 2
-        })
-        break
-      }
-      case states[3]: {
-        this.setData({
-          active: 3
-        })
-        break
-      }
-
-
-    }
 
   },
 

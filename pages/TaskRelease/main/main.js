@@ -233,17 +233,20 @@ Page({
       })
       return
     }
-    if (this.data.taskDDL.length == 0) {
+    
+    let notANumRegex = /[^0-9]/i
+    if (notANumRegex.exec(this.data.taskQuestionID) != null) {
       wx.showToast({
-        title: '任务时间不能空!',
+        title: '问卷ID必须为数字类型!',
         icon: 'none',
         duration: 2000
       })
       return
     }
-    if (!Number.isInteger(this.data.taskQuestionID) ){
+
+    if (this.data.taskDDL.length == 0) {
       wx.showToast({
-        title: '问卷ID必须为数字类型!',
+        title: '任务时间不能空!',
         icon: 'none',
         duration: 2000
       })
@@ -275,7 +278,7 @@ Page({
             'priority': 0,
             'maxAccept': this.data.taskMaxAccept,
             'hasAccept': 0,
-            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire' ? this.data.taskQuestionID : null
+            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire' ? Number(this.data.taskQuestionID) : null
           },
           success(res) {
             console.log(res)
@@ -330,7 +333,7 @@ Page({
             'maxAccept': this.data.taskMaxAccept,
             'hasAccept': 0,
             'userid': 2,
-            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire'?this.data.taskQuestionID:null
+            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire'? Number(this.data.taskQuestionID) : null
           },
           success(res) {
             
