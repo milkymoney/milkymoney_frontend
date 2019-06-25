@@ -214,6 +214,7 @@ Page({
   submitTask() {
     console.log(this.data)
     //异常处理
+    console.log(this.data.taskName.length)
     if (this.data.taskName.length==0){
       wx.showToast({
         title: '任务名不能空!',
@@ -222,9 +223,9 @@ Page({
       })
       return
     }
-    if (this.data.tags.length == 0) {
+    if (this.data.taskName.length>20){
       wx.showToast({
-        title: '标签不能空!',
+        title: '任务名过长!',
         icon: 'none',
         duration: 2000
       })
@@ -233,6 +234,39 @@ Page({
     if (this.data.taskInfo.length == 0) {
       wx.showToast({
         title: '任务描述不能空!',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+    if (this.data.taskInfo.length>300) {
+      wx.showToast({
+        title: '任务描述过长!',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+    
+    let tmpTags = this.data.tags.split(/\s+/)
+    let cleanTags = []
+    for (let i = 0; i < tmpTags.length; ++i) {
+      if (tmpTags[i] != "") {
+        if (tmpTags[i].length > 10) {
+          wx.showToast({
+            title: '单个标签过长!',
+            icon: 'none',
+            duration: 2000
+          })
+          return
+        }
+        cleanTags.push(tmpTags[i])
+      }
+    }
+    console.log(cleanTags.length)
+    if (cleanTags.length == 0) {
+      wx.showToast({
+        title: '标签不能空!',
         icon: 'none',
         duration: 2000
       })
@@ -259,7 +293,6 @@ Page({
     }
     
     //这里可以发布新任务，也是修改任务的地方
-
     if (!this.data.isModifyTask) {
       let taskPromise = new Promise((resolve, reject) => {
         console.log('POST /task/publisher')
@@ -590,7 +623,7 @@ Page({
           console.log(res)
           if (Array.isArray(res.data)) {
             res.data.forEach(function (atask) {
-              let taskTag = atask.label.split(" ")
+              let taskTag = atask.label.split(/\s+/)
               let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
               let _atask = {
                 taskReward: atask.reward,
@@ -718,7 +751,7 @@ Page({
             console.log(res)
             if (Array.isArray(res.data)){
               res.data.forEach(function (atask) {
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
@@ -804,7 +837,7 @@ Page({
             console.log(res)
             if (Array.isArray(res.data)) {
               res.data.forEach(function (atask) {
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,

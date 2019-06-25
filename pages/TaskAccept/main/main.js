@@ -314,7 +314,7 @@ Page({
           if (Array.isArray(res.data)&&res.data.length>0) {
             console.log(res.data)
             res.data.forEach(function (atask) {
-              let taskTag = atask.label.split(" ")
+              let taskTag = atask.label.split(/\s+/)
               let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
               let _atask = {
                 taskReward: atask.reward,
@@ -458,7 +458,7 @@ Page({
             if (res.data != null) {
               res.data.forEach(function (atask) {
 
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
@@ -569,7 +569,7 @@ Page({
             if (Array.isArray(res.data)&&res.data.length>0) {
               console.log(res.data)
               res.data.forEach(function (atask) {
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
@@ -628,7 +628,7 @@ Page({
             console.log(res)
             if (Array.isArray(res.data)){
               res.data.forEach(function (atask) {
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
@@ -708,7 +708,7 @@ Page({
             if (Array.isArray(res.data) && res.data.length>0) {
               console.log(res.data)
               res.data.forEach(function (atask) {
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
@@ -766,7 +766,7 @@ Page({
             console.log(res)
             if (Array.isArray(res.data)&&res.data.length>0) {
               res.data.forEach(function (atask) {
-                let taskTag = atask.label.split(" ")
+                let taskTag = atask.label.split(/\s+/)
                 let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
                 let _atask = {
                   taskReward: atask.reward,
