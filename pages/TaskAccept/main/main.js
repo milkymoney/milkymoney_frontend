@@ -30,7 +30,7 @@ Page({
       right2: false
     },
     areas: ["所有",'广州', "深圳", "佛山", "东莞", "珠海", "澳门", "香港", "中山"],
-    taskType:["不限类型","数据调研","数据采集","跑腿服务"],
+    taskType:["不限类型","问卷调研","跑腿服务"],
     sortOrder:["不限排序","最新发布","离我最近","报酬最高"],
 
     areaSelected:'所有',
@@ -39,12 +39,18 @@ Page({
 
     selectedToogle:'areas',
     selectedInfo:'所有 不限类型 不限排序',
-
-    myTasks:[],
+    
+    //记录当前的page页数
+    currentTaskListPage:0,
+    currentMyTasksPage:0,
+    
     myPendingTasks:[],
     myDoingTasks:[],
     myCheckingTasks:[],
     myOtherTasks:[],
+
+    //用来缓存未被加入PendingTasks DoingTasks等的task
+    myTasksTemp:[],
 
     userInfo:null
   },
@@ -54,18 +60,45 @@ Page({
    */
   navToTaskDetail(event) {
     //console.log(event)
-
-    console.log(this.data)
+    console.log('navToTaskDetail')
+    console.log(this.data.myDoingTasks)
     let selectedTask = {}
-    this.data.taskList.forEach(function(atask) {
-      if (atask.taskID == event.target.id) {
-        selectedTask = atask
-      }
-    })
-    console.log(selectedTask)
-    if (Array.isArray(selectedTask.tags))
-      selectedTask.tags = selectedTask.tags.join(' ')
+    
+    if(this.data.selection==3){
+      this.data.myPendingTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+      this.data.myDoingTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+      this.data.myCheckingTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+      this.data.myOtherTasks.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+    }else{
+      this.data.taskList.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+    }
 
+    
+
+    console.log(selectedTask)
+    if (Array.isArray(selectedTask.tags)){
+      selectedTask.tags = selectedTask.tags.join(' ')
+    }
 
     wx.navigateTo({
       url: '../task_datail/task_detail?taskID=' + selectedTask.taskID 
@@ -123,7 +156,8 @@ Page({
   onConfirmArea(event) {
     const { picker, value, index } = event.detail;
     this.setData({
-      areaSelected:value
+      areaSelected:value,
+      
     })
     console.log("onConfirmArea:" + this.data.areaSelected)
     this.toggleBottomPopup()
@@ -132,11 +166,40 @@ Page({
   
   onConfirmTaskType(event) {
     const { picker, value, index } = event.detail;
+    
+    console.log("onConfirmTaskType:"+this.data.taskTypeSelected);
     this.setData({
       taskTypeSelected: value
     });
-    console.log("onConfirmTaskType:"+this.data.taskTypeSelected);
     this.toggleBottomPopup()
+
+    
+    let taskList = []
+
+    //对于taskList选择
+    if (this.data.taskTypeSelected == "不限类型") {
+      taskList = this.data.taskList
+
+    } else if (this.data.taskTypeSelected == "问卷调研") {
+
+      this.data.taskList.forEach(function (task) {
+        if (task.type == types[0]) {
+          //问卷
+          taskList.push(task)
+        }
+      })
+
+    } else if (this.data.taskTypeSelected == "跑腿服务") {
+      this.data.taskList.forEach(function (task) {
+        if (task.type == types[1]) {
+          //跑腿
+          taskList.push(task)
+        }
+      })
+    }
+    this.setData({
+      seletcedTaskList: taskList
+    })
     this.selectTaskBasedOnSelectedInfo()
   },
 
@@ -154,25 +217,39 @@ Page({
    * 根据筛选标准排序 
    */
   selectTaskBasedOnSelectedInfo(){
-    //发送区域和类型到服务器后端，然后根据返回结果进行排序，暂时未做完
-
-    //暂定seletcedTaskListTemp为从后端获取到的数据
-    let seletcedTaskListTemp=this.data.taskList
-    this.setData({
-      seletcedTaskList:seletcedTaskListTemp
-    })
+    
+    if(this.data.seletcedTaskList.length==0){
+      this.setData({
+        seletcedTaskList: this.data.taskList
+      })
+    }
+    
+    
     //对上面的进行排序
-    if (this.sortOrderSelected =='最新发布'){
+    if (this.data.sortOrderSelected =='最新发布'){
 
-    } else if (this.sortOrderSelected == '离我最近'){
-
-    } else if (this.sortOrderSelected == '报酬最高'){
-
+    } else if (this.data.sortOrderSelected == '离我最近'){
+      
+    } else if (this.data.sortOrderSelected == '报酬最高'){
+      let len=this.data.seletcedTaskList.length
+      for (let i=0;i<len;i++){
+        console.log(this.data.seletcedTaskList[i].taskReward)
+        for (let j=0;j<len;j++){
+          if (this.data.seletcedTaskList[i].taskReward 
+          > this.data.seletcedTaskList[j].taskReward ){
+            let temp = this.data.seletcedTaskList[i]
+            this.data.seletcedTaskList[i] = this.data.seletcedTaskList[j]
+            this.data.seletcedTaskList[j]=temp
+          }
+        }
+      }
     }else{
       //无需排序
 
     }
-
+    this.setData({
+      seletcedTaskList: this.data.seletcedTaskList
+    })
   },
 
   /**
@@ -208,8 +285,74 @@ Page({
 
   onSearchMain(){
     console.log("onSearchMain:"+this.data.search_value_main)
+    let _taskList = []
+
+    //将获取到的所有已发布任务装入_taskList
+
+    new Promise((resolve, reject) => {
+      console.log('GET /task')
+
+      wx.request({
+        url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+        method: 'GET',
+        header: {
+          'accept': 'application/json'
+        },
+        success(res) {
+          if (Array.isArray(res.data)&&res.data.length>0) {
+            console.log(res.data)
+            res.data.forEach(function (atask) {
+              let taskTag = atask.label.split(" ")
+              let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+              let _atask = {
+                taskReward: atask.reward,
+                taskInfo: atask.description,
+                type: atask.type,
+                taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                imageURL: imgURL,
+                tags: taskTag,
+                taskID: atask.tid
+              }
+              _taskList.push(_atask)
+            })
+            resolve('ok')
+          }else{
+            resolve('null')
+          }
+          
+        }
+      })
+    }).then((res) => {
+      if(res=='ok'){
+        wx.showToast({
+          title: '搜索成功',
+          icon: 'success',
+          duration: 2000,
+        })
+      }else{
+        wx.showToast({
+          title: '无相关内容',
+          icon: 'none',
+          duration: 2000,
+        })
+      }
+      
+      this.setData({
+        taskList: _taskList,
+        currentTaskListPage: 0,
+
+
+      })
+
+      console.log(_taskList)
+
+    })
+
+    this.selectTaskBasedOnSelectedInfo()
+    
   },
 
+  /*暂时不用
   onChangePersonalTask(event){
     this.setData({
       search_value_personal: event.detail
@@ -217,41 +360,20 @@ Page({
   },
 
   onSearchPersonalTask(){
-    console.log("onSearchPersonalTask:" + this.data.search_value_personal)
+    //console.log("onSearchPersonalTask:" + this.data.search_value_personal)
     
-  },
+  },*/
 
   /**
    * 切换任务袋的tab
    */
   onChangeTab(event){
-    this.onPullDownRefresh()
-    //这里未完成，以后需要从服务端获取对应的个人任务
-    this.setData({
-      myTasks:this.data.taskList,
-      myPendingTasks: [],
-      myDoingTasks: [],
-      myCheckingTasks: [],
-      myOtherTasks: []
-    })
+    
 
-    if (event.detail.index==0){
-      //待审核
-      this.preparePendingTasks()
-    } else if (event.detail.index==1){
-      //待完成
-      this.prepareDoingTasks()
-    } else if (event.detail.index == 2) {
-      //待验收
-      this.prepareCheckingTasks()
-    }else{
-      //其他
-      this.prepareOtherTasks() 
-    }
   },
   preparePendingTasks(){
     let listTemp = this.data.myPendingTasks
-    this.data.myTasks.forEach(task => {
+    this.data.myTasksTemp.forEach(task => {
       if (task.state == states[0]) {
         listTemp.push(task)
         this.setData({
@@ -262,7 +384,7 @@ Page({
   },
   prepareDoingTasks() {
     let listTemp = this.data.myDoingTasks
-    this.data.myTasks.forEach(task => {
+    this.data.myTasksTemp.forEach(task => {
       if (task.state == states[1]) {
         listTemp.push(task)
         this.setData({
@@ -273,7 +395,7 @@ Page({
   },
   prepareCheckingTasks() {
     let listTemp = this.data.myCheckingTasks
-    this.data.myTasks.forEach(task => {
+    this.data.myTasksTemp.forEach(task => {
       if (task.state == states[2]) {
         listTemp.push(task)
         this.setData({
@@ -284,7 +406,7 @@ Page({
   },
   prepareOtherTasks() {
     let listTemp = this.data.myOtherTasks
-    this.data.myTasks.forEach(task => {
+    this.data.myTasksTemp.forEach(task => {
       if (task.state == states[3]) {
         listTemp.push(task)
         this.setData({
@@ -347,29 +469,38 @@ Page({
         })
       })
 
-      taskPromise.then((resolve) => {
-
-
+      taskPromise.then((res) =>{
+        if (res == 'null') {
+          wx.showToast({
+            title: '无相关内容',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
+        
         this.setData({
           taskList: taskListPre,
           userInfo: getApp().globalData.userInfo,
-          myTasks: taskListPre,
+          myTasksTemp: taskListPre,
           myPendingTasks: [],
           myDoingTasks: [],
           myCheckingTasks: [],
           myOtherTasks: []
         })
 
-        console.log(resolve)
         console.log(taskListPre)
 
         this.preparePendingTasks()
         this.prepareDoingTasks()
         this.prepareCheckingTasks()
         this.prepareOtherTasks()
-      })
 
+        this.setData({
+          myTasksTemp:[]
+        })
+      })
     }
+    
   },
 
   /**
@@ -412,11 +543,10 @@ Page({
       let _taskList=[]
 
       //将获取到的所有已发布任务装入_taskList
-    
 
-      let taskPromise=new Promise( (resolve,reject)=>{
+      new Promise( (resolve,reject)=>{
         console.log('GET /task')
-        console.log('search main value: ' + this.data.search_value_main)
+        console.log('keyword',this.data.search_value_main)
         wx.request({
           url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
           method: 'GET',
@@ -424,7 +554,7 @@ Page({
             'accept': 'application/json'
           },
           success(res) {
-            if (res.data != null) {
+            if (Array.isArray(res.data)&&res.data.length>0) {
               console.log(res.data)
               res.data.forEach(function (atask) {
                 let taskTag = atask.label.split(" ")
@@ -441,18 +571,28 @@ Page({
                 _taskList.push(_atask)
               })
               resolve('ok')
+            }else{
+              resolve('null')
             }
-            resolve('null')
+            
           }
         })
-      } )
-      taskPromise.then( (resolve)=>{
-   
+      } ).then( (res)=>{
+        if (res == 'null') {
+          wx.showToast({
+            title: '无相关内容',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
         this.setData({
-          taskList: _taskList
+          taskList: _taskList,
+          currentTaskListPage: 0,
+          
+
         })
 
-        console.log(resolve)
+        console.log(res)
         console.log(_taskList)
 
       } )
@@ -463,7 +603,7 @@ Page({
 
       //将获取到的自己接收到的放入_myTasks
 
-      let taskPromise=new Promise((resolve,reject)=>{
+      new Promise((resolve,reject)=>{
         console.log('GET /task/recipient')
         console.log('search value personal: ' + this.data.search_value_personal)
         wx.request({
@@ -496,17 +636,16 @@ Page({
             
           }
         })
-      })
-     
-      taskPromise.then( (resolve)=>{
+      }).then( (resolve)=>{
      
         this.setData({
           taskList: _myTasks,
-          myTasks: _myTasks,
+          myTasksTemp: _myTasks,
           myPendingTasks: [],
           myDoingTasks: [],
           myCheckingTasks: [],
-          myOtherTasks: []
+          myOtherTasks: [],
+          currentMyTasksPage: 0,
         })
         console.log(resolve)
         console.log(_myTasks)
@@ -516,6 +655,9 @@ Page({
         this.prepareCheckingTasks()
         this.prepareOtherTasks()
 
+        this.setData({
+          myTasksTemp: []
+        })
       } )
 
       
@@ -531,6 +673,143 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
+
+    //在标题栏中显示加载
+    wx.showNavigationBarLoading()
+    //这里增加刷新函数
+    if (this.data.selection == 0 || this.data.selection == 1) {
+      //下拉刷新所有的可见已发布任务
+      let _taskList = this.data.taskList
+
+      //将获取到的所有已发布任务装入_taskList
+
+      new Promise((resolve, reject) => {
+        console.log('GET /task')
+
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task?page='+(this.data.currentTaskListPage+1)+'&keyword=' + this.data.search_value_main + '&userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            if (Array.isArray(res.data) && res.data.length>0) {
+              console.log(res.data)
+              res.data.forEach(function (atask) {
+                let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+                let _atask = {
+                  taskReward: atask.reward,
+                  taskInfo: atask.description,
+                  type: atask.type,
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
+                  tags: taskTag,
+                  taskID: atask.tid
+                }
+                _taskList.push(_atask)
+              })
+              resolve('ok')
+            }else{
+              resolve('null')
+            }
+            
+          }
+        })
+      }).then((res) => {
+        
+        this.setData({
+          taskList: _taskList,
+          currentTaskListPage: res == 'ok' ? this.data.currentTaskListPage + 1 : this.data.currentTaskListPage
+        })
+        console.log(res)
+        if(res=='null'){
+          wx.showToast({
+            title: '无更多任务!',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
+
+        console.log(_taskList)
+
+      })
+
+    } else if (this.data.selection == 3) {
+      //下拉刷新自己已接受的任务袋
+      let _myTasks = this.data.myTasksTemp
+
+      //将获取到的自己接收到的放入_myTasks
+
+      let taskPromise = new Promise((resolve, reject) => {
+        console.log('GET /task/recipient')
+        console.log('search value personal: ' + this.data.search_value_personal)
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page='+(this.data.currentMyTasksPage+1)+'&keyword=' + this.data.search_value_personal + '&userId=3',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            console.log(res)
+            if (Array.isArray(res.data)&&res.data.length>0) {
+              res.data.forEach(function (atask) {
+                let taskTag = atask.label.split(" ")
+                let imgURL = (atask.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png"
+                let _atask = {
+                  taskReward: atask.reward,
+                  taskInfo: atask.description,
+                  type: atask.type,
+                  taskName: (atask.type == types[0]) ? "问卷任务" : "跑腿任务",
+                  imageURL: imgURL,
+                  tags: taskTag,
+                  state: states[atask.state],
+                  taskID: atask.tid
+                }
+                _myTasks.push(_atask)
+              })
+              resolve('ok')
+            }else{
+              resolve('null')
+            }
+            
+
+          }
+        })
+      })
+
+      taskPromise.then((res) => {
+
+        this.setData({
+          
+          myTasksTemp: _myTasks,
+          currentMyTasksPage:res=='ok'?this.data.currentMyTasksPage+1:this.data.currentMyTasksPage
+        })
+        if (res == 'null') {
+          wx.showToast({
+            title: '无更多任务!',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
+        
+
+        this.preparePendingTasks()
+        this.prepareDoingTasks()
+        this.prepareCheckingTasks()
+        this.prepareOtherTasks()
+
+        this.setData({
+          myTasksTemp: [],
+
+        })
+      })
+
+    }
+
+    //加载完成
+    wx.hideNavigationBarLoading()
+    wx.stopPullDownRefresh()
 
   },
 
