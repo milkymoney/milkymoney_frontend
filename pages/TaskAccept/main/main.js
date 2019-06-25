@@ -224,10 +224,22 @@ Page({
       })
     }
     
+    console.log(this.data.seletcedTaskList)
     
     //对上面的进行排序
     if (this.data.sortOrderSelected =='最新发布'){
-
+      // taskId 越大就视为越新，不过就修改任务而言好像有点不太对
+      let len = this.data.seletcedTaskList.length
+      for (let i = 0; i < len; i++) {
+        for (let j = 0; j < len; ++j) {
+          if (this.data.seletcedTaskList[i].taskID >
+          this.data.seletcedTaskList[j].taskID) {
+            let temp = this.data.seletcedTaskList[i]
+            this.data.seletcedTaskList[i] = this.data.seletcedTaskList[j]
+            this.data.seletcedTaskList[j] = temp
+          }
+        }
+      }
     } else if (this.data.sortOrderSelected == '离我最近'){
       
     } else if (this.data.sortOrderSelected == '报酬最高'){
