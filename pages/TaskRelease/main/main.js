@@ -512,6 +512,7 @@ Page({
       if (this.data.isModifyTask == true) {
         this.data.isModifyTask = false
       }
+      this.onPullDownRefresh()
     } else if (this.data.selection==3) {
       this.onPullDownRefresh()
     }
@@ -808,8 +809,33 @@ Page({
         wx.stopPullDownRefresh()
       })
     }
-    else{
-      wx.stopPullDownRefresh()
+    else if(this.data.selection==0){
+      //刷新钱包
+      let balance=0
+      new Promise((resolve, reject) => {
+
+        //获取账户余额
+
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+          method: 'GET',
+          header: {
+            'accept': 'application/json'
+          },
+          success(res) {
+            balance = res.data.balance
+            resolve('ok')
+          }
+        })
+
+      }).then((res) =>{
+        console.log(balance)
+        this.setData({
+          balance:balance
+        })
+        wx.stopPullDownRefresh()
+      })
+      
     }
     
   },
