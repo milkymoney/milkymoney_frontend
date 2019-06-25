@@ -397,6 +397,12 @@ Page({
       usersDataTemp.push(user2_data)
       usersDataTemp.push(user3_data)
 
+      // 简单排序等待验收的接受者，其中unchecked的排在前面，其次是passed，最后是unpassed
+      let checkState2i = { "unchecked": 0, "passed": 1, "unpassed": 2}
+      usersDataTemp.sort(function(a, b) {
+        return checkState2i[a.state] - checkState2i[b.state]
+      })
+
       //这个是用于存储验收状态的
       let checkTemp = []
       for (let i = 0; i < usersDataTemp.length; i++) {
