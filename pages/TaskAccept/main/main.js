@@ -347,14 +347,20 @@ Page({
           icon: 'none',
           duration: 2000,
         })
+        
+      }
+      if(this.data.selection==0){
+        this.setData({
+          taskList: _taskList,
+          currentTaskListPage: 0,
+        })
+      }else if(this.data.selection==1){
+        this.setData({
+          seletcedTaskList: _taskList,
+          currentTaskListPage: 0,
+        })
       }
       
-      this.setData({
-        taskList: _taskList,
-        currentTaskListPage: 0,
-
-
-      })
 
       console.log(_taskList)
 
@@ -458,7 +464,7 @@ Page({
           },
           success(res) {
             console.log(res)
-            if (res.data != null) {
+            if (Array.isArray(res.data) && res.data.length > 0) {
               res.data.forEach(function (atask) {
 
                 let taskTag = atask.label.split(/\s+/)
@@ -476,18 +482,17 @@ Page({
                 taskListPre.push(_atask)
               })
               resolve('ok')
-            }
-            resolve('null')
+            }else{
+              resolve('null')
+            }      
           }
-
-
         })
       })
 
       taskPromise.then((res) =>{
         if (res == 'null') {
           wx.showToast({
-            title: '无相关内容',
+            title: '空空如也',
             icon: 'none',
             duration: 2000,
           })
@@ -600,12 +605,18 @@ Page({
             duration: 2000,
           })
         }
-        this.setData({
-          taskList: _taskList,
-          currentTaskListPage: 0,
-          
-
-        })
+        if(this.data.selection==0){
+          this.setData({
+            taskList: _taskList,
+            currentTaskListPage: 0,
+          })
+        }else if(this.data.selection==1){
+          this.setData({
+            seletcedTaskList: _taskList,
+            currentTaskListPage: 0,
+          })
+        }
+        
 
         console.log(res)
         console.log(_taskList)
@@ -646,13 +657,21 @@ Page({
                 _myTasks.push(_atask)
               })
               resolve('ok')
+            }else{
+              resolve('null')
             }
-            resolve('null')
+            
             
           }
         })
-      }).then( (resolve)=>{
-     
+      }).then( (res)=>{
+        if (res == 'null') {
+          wx.showToast({
+            title: '无相关内容',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
         this.setData({
           taskList: _myTasks,
           myTasksTemp: _myTasks,
@@ -662,7 +681,7 @@ Page({
           myOtherTasks: [],
           currentMyTasksPage: 0,
         })
-        console.log(resolve)
+        console.log(res)
         console.log(_myTasks)
 
         this.preparePendingTasks()
