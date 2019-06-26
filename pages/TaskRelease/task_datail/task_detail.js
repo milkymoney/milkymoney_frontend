@@ -317,6 +317,15 @@ Page({
       return
     }
 
+    
+    let confirmTimes = 2
+    if (passedUsers.length == 0) {
+      confirmTimes -= 1
+    }
+    if (unpassedUsers.length == 0) {
+      confirmTimes -= 1
+    }
+
     let taskPromise = new Promise((resolve, reject) => {
       console.log('POST /task/publisher/confirm/{taskId}')
       let confirms = []
@@ -335,7 +344,7 @@ Page({
           success(res) {
             console.log(res)
             confirms.push(res.data)
-            if (confirms.length == 2) {
+            if (confirms.length == confirmTimes) {
               resolve(confirms)
             }
           }
@@ -356,7 +365,7 @@ Page({
           success(res) {
             console.log(res)
             confirms.push(res.data)
-            if (confirms.length == 2) {
+            if (confirms.length == confirmTimes) {
               resolve(confirms)
             }
           }
@@ -366,7 +375,18 @@ Page({
     })
 
     taskPromise.then((resolve) => {
-      if(resolve[0].success && resolve[1].success) {
+      if(resolve.length == 1 && resolve[0].success) {
+        wx.navigateTo({
+          url: '../main/main',
+          success: () => {
+            wx.showToast({
+              title: '验收成功',
+              icon: 'success',
+              duration: 2000
+            })
+          }
+        })
+      } else if (resolve.length == 2 && resolve[0].success && resolve[1].success) {
         wx.navigateTo({
           url: '../main/main',
           success: () => {
