@@ -289,15 +289,13 @@ Page({
     //支付
     this.showCustomDialog({
       success: () => {
-        console.log('safqe')
+        console.log('asd')
       }
     })
 
     console.log('验收提交')
-    let uncheckedUsers = []
     let passedUsers = []
     let unpassedUsers = []
-    let users = [[], [], []]
 
     let usersDataTemp = this.data.usersData
     //提交之后刷新页面
@@ -306,17 +304,15 @@ Page({
       if (usersDataTemp[i].state == checkState[0]) {
         if (this.data.isPass[i]) {
           usersDataTemp[i].state = checkState[1]
-          users[1].push(usersDataTemp[i].userID)
+          passedUsers.push(usersDataTemp[i].userID)
         } else if (this.data.isUnPass[i]) {
           usersDataTemp[i].state = checkState[2]
-          users[2].push(usersDataTemp[i].userID)
-        } else {
-          users[0].push(usersDataTemp[i].userID)
-        }
+          unpassedUsers.push(usersDataTemp[i].userID)
+        } 
       } else if (usersDataTemp[i].state == checkState[1]) {
-        users[1].push(usersDataTemp[i].userID)
+        passedUsers.push(usersDataTemp[i].userID)
       } else if (usersDataTemp[i].state == checkState[2]) {
-        users[2].push(usersDataTemp[i].userID)
+        unpassedUsers.push(usersDataTemp[i].userID)
       }
     }
 
@@ -329,20 +325,20 @@ Page({
     //{  userID: 用户ID,
     //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
     // }
-    let failed = []
-    let postIndex = 1
-    let postLength = 2
+
+    if (passedUsers.length == 0 && unpassedUsers.length == 0) {
+      wx.showToast({
+        title: '未验收任何用户',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
     let taskPromise = new Promise((resolve, reject) => {
       console.log('POST /task/publisher/confirm/{taskId}')
-      for(var i = 1; i < 3; ++i) {
-        if (users[i].length == 0) {
-          postLength -= 1
-        }
-      }
-      for(var i = 1; i < 3; ++i) {
-        if(users[i].length == 0) {
-          continue
-        }
+      let confirms = []
+      if (passedUsers.length != 0) {
         wx.request({
           url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID + '?userId=2',
           method: 'POST',
@@ -351,27 +347,44 @@ Page({
             'content-type': 'application/json'
           },
           data: {
-            'confirm': checkState[i],
-            'users': users[i]
+            'checkState': "passed",
+            'users': passedUsers
           },
           success(res) {
             console.log(res)
-            if (res.data.success) {
-              postIndex += 1
-            } else {
-              failed.push(String(postIndex))
-              postIndex += 1
-            }
-            if (postIndex == postLength + 1) {
-              resolve(failed)
+            confirms.push(res.data)
+            if (confirms.length == 2) {
+              resolve(confirms)
             }
           }
         })
       }
+      if (unpassedUsers.length != 0) {
+        wx.request({
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID + '?userId=2',
+          method: 'POST',
+          header: {
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          data: {
+            'checkState': "unpassed",
+            'users': unpassedUsers
+          },
+          success(res) {
+            console.log(res)
+            confirms.push(res.data)
+            if (confirms.length == 2) {
+              resolve(confirms)
+            }
+          }
+        })
+      }
+
     })
 
     taskPromise.then((resolve) => {
-      if(resolve.length == 0) {
+      if(resolve[0].success && resolve[1].success) {
         wx.navigateTo({
           url: '../main/main',
           success: () => {
