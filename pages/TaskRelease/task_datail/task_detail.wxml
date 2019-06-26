@@ -27,11 +27,11 @@
   direction="vertical"
   active-color="#f44"
 />
-<van-cell title="基本要求" size="large" label="描述信息" />
-<van-cell title="任务介绍" size="large" label="描述信息" />
-<van-cell title="评价细则" size="large" label="描述信息" />
+<van-cell title="基本要求" size="large" label="{{taskInfo}}" />
+<van-cell title="任务介绍" size="large" label="{{taskInfo}}" />
+<van-cell title="评价细则" size="large" label="{{taskInfo}}" />
 
-<block wx:if='{{state!="finished"}}'>
+<block wx:if='{{state!="finished"&&usersData.length==0}}'>
   <van-button type="warning" class='but' bind:click="changeTask">修改您的任务</van-button>
   <van-button type="danger" class='but' bind:click="deleteTask">删除您的任务</van-button>
 </block>
