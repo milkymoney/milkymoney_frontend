@@ -313,7 +313,7 @@ Page({
             'priority': 0,
             'maxAccept': this.data.taskMaxAccept,
             'hasAccept': 0,
-            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire' ? Number(this.data.taskQuestionID) : null
+            'questionID': types[Number(this.data.taskTypeSelection)] == 'questionnaire' ? Number(this.data.taskQuestionID) : 0
           },
           success(res) {
             console.log(res)
@@ -368,7 +368,7 @@ Page({
             'maxAccept': this.data.taskMaxAccept,
             'hasAccept': 0,
             'userid': 2,
-            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire'? Number(this.data.taskQuestionID) : null
+            'questionnaireID': types[Number(this.data.taskTypeSelection)] == 'questionnaire'? Number(this.data.taskQuestionID) : 0
           },
           success(res) {
             
