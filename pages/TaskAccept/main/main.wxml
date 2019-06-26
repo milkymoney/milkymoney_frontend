@@ -159,8 +159,13 @@
             </view>
           </van-card>
         </view>
+
+       
+
       </van-tab>
       <van-tab title="待完成">
+        
+        
         <view wx:for='{{myDoingTasks}}' wx:key="taskID">
           <van-card
             price="{{item.taskReward}}"
@@ -176,6 +181,7 @@
             </view>
           </van-card>
         </view>
+        
       </van-tab>
       <van-tab title="待验收">
         <view wx:for='{{myCheckingTasks}}' wx:key="taskID">
@@ -193,6 +199,7 @@
             </view>
           </van-card>
         </view>
+        
       </van-tab>
       <van-tab title="其他">
         <view wx:for='{{myOtherTasks}}' wx:key="taskID">
@@ -208,12 +215,14 @@
             <view slot="footer">
               <van-button id="{{item.taskID}}" size="mini" bind:tap="navToTaskDetail">点击查看</van-button>
             </view>
+            
           </van-card>
         </view>
+        
       </van-tab>
 
     </van-tabs>
-
+    <view class="myTaskButtom"/>
   </block>
   <block wx:if="{{selection==4}}">
     <!--个人主页-->
@@ -245,7 +254,7 @@
     </view>
   </block>
 
-  <view class="bottom-view"/>
+  
 </view>
 
 <van-tabbar active="{{ active }}" bind:change="onChange">

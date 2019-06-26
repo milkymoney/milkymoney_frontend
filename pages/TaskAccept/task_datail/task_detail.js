@@ -9,7 +9,7 @@ import Toast from '../../../dist/toast/toast';
 
 var states = ['pending', 'doing', 'checking', 'other']
 var types = ['questionnaire', 'errand']
-
+var app = getApp();
 
 Page({
 
@@ -82,7 +82,7 @@ Page({
       
       for (var imgIndex = 0; imgIndex < imagesNum; ++imgIndex) {
         wx.uploadFile({
-          url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID + '?userId=3',
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID ,
           filePath: this.data.images[imgIndex],
           name: 'myfile',
           formData: {
@@ -90,6 +90,7 @@ Page({
           },
           header: {
             'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             let data = JSON.parse(res.data)
@@ -142,10 +143,11 @@ Page({
     let taskPromise = new Promise((resolve, reject) => {
       console.log('POST /task/recipient/{taskId}')
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + this.data.taskID + '?userId=3',
+        url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + this.data.taskID ,
         method: 'POST',
         header: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          "Cookie": app.globalData.sessionKey
         },
         success(res) {
           console.log(res)
@@ -160,7 +162,7 @@ Page({
           url: '../main/main?selection=3',
           success: () => {
             wx.showToast({
-              title: resolve.message,
+              title: '接收任务成功',
               icon: 'success',
               duration: 2000,
             })
@@ -168,7 +170,7 @@ Page({
         })
       } else {
         wx.showToast({
-          title: resolve.message,
+          title: '接收任务失败',
           icon: 'none',
           duration: 2000,
         })
@@ -263,10 +265,11 @@ Page({
       console.log('GET /task/recipient/{taskID}')
       console.log('options.taskID: ' + options.taskID)
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + options.taskID + '?userId=3',
+        url: 'https://www.wtysysu.cn:10443/v1/task/recipient/' + options.taskID ,
         method: 'GET',
         header: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          "Cookie": app.globalData.sessionKey
         },
         success(res) {
           console.log(res)
@@ -359,7 +362,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
+    wx.stopPullDownRefresh()
   },
 
   /**

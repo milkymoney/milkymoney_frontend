@@ -1,15 +1,43 @@
 //app.js
 App({
+  globalData: {
+    userInfo: null,
+    sessionKey: null
+  },
   onLaunch: function () {
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
-
+    
     // 登录
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
+        if (res.code) {
+          var res_code = res.code
+          console.log('GET /user/login')
+          console.log('wx.login return code: ' + res_code)
+          wx.request({
+            url: 'https://www.wtysysu.cn:10443/v1/user/login?code=' + res_code,
+            method: 'GET',
+            header: {
+              'accept': 'application/json',
+              'content-type': 'application/json'
+            },
+            success:res=> {
+              console.log(res)
+              console
+              var session_key = res.header['Set-Cookie'].split(';')[0]
+              console.log('session key: ' + session_key)
+              this.globalData.sessionKey=session_key
+            }
+          })
+        }
+        else {
+          console.log('登录失败！' + res.errMsg)
+
+        }
       }
     })
     // 获取用户信息
@@ -33,7 +61,5 @@ App({
       }
     })
   },
-  globalData: {
-    userInfo: null
-  }
+  
 })

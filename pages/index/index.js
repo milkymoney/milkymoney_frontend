@@ -20,12 +20,26 @@ Page({
 
   //跳转到发布任务主页面
   navToTaskReleaseMainPage:function(){
+    if (app.globalData.sessionKey==null){
+      wx.showToast({
+        title: '登陆失败',
+        icon:'none'
+      })
+      return
+    }
     wx.redirectTo({
       url: '../TaskRelease/main/main',
     })
   },
   //跳转到接受任务主页
   navToTaskAcceptMainPage: function () {
+    if (app.globalData.sessionKey == null) {
+      wx.showToast({
+        title: '登陆失败',
+        icon: 'none'
+      })
+      return
+    }
     wx.redirectTo({
       url: '../TaskAccept/main/main',
     })
@@ -38,6 +52,7 @@ Page({
         userInfo: app.globalData.userInfo,
         hasUserInfo: true
       })
+      console.log(app.globalData.userInfo)
     } else if (this.data.canIUse){
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
@@ -46,6 +61,7 @@ Page({
           userInfo: res.userInfo,
           hasUserInfo: true
         })
+        console.log(app.globalData.userInfo)
       }
     } else {
       // 在没有 open-type=getUserInfo 版本的兼容处理
@@ -56,9 +72,11 @@ Page({
             userInfo: res.userInfo,
             hasUserInfo: true
           })
+          console.log(app.globalData.userInfo)
         }
       })
     }
+    
   },
   getUserInfo: function(e) {
     console.log(e)

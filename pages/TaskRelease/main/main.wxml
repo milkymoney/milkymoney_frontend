@@ -196,6 +196,7 @@
         </view>
       </van-tab>
     </van-tabs>
+    <view class="myTaskButtom"/>
   </block>
 
   <block wx:if="{{selection==4}}">

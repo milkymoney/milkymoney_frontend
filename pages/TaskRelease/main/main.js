@@ -6,7 +6,7 @@ import Dialog from '../../../dist/dialog/dialog';
 //发布方，state对应为[4,5,6]
 var states = ['pending', 'doing', 'finished']
 var types = ['questionnaire', 'errand']
-
+var app = getApp();
 
 
 Page({
@@ -129,11 +129,12 @@ Page({
         //当前金额为this.data.balance，本次充值金额为rechargeNum
 
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/user/balance?userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/user/balance',
           method: 'PUT',
           header: {
             'accept': 'application/json',
-            'content-type': 'application/json'
+            'content-type': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           data: {
             "recharge":rechargeNum
@@ -146,10 +147,11 @@ Page({
       }).then((res)=>{
         return new Promise((resolve,reject)=>{
           wx.request({
-            url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+            url: 'https://www.wtysysu.cn:10443/v1//user/?',
             method: 'GET',
             header: {
-              'accept': 'application/json'
+              'accept': 'application/json',
+              "Cookie": app.globalData.sessionKey
             },
             success(res) {
               balance = res.data.balance
@@ -297,11 +299,12 @@ Page({
       let taskPromise = new Promise((resolve, reject) => {
         console.log('POST /task/publisher')
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/?userId=2',  
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/',  
           method: 'POST',
           header: {
             'accept': 'application/json',
-            'content-type': 'application/json'
+            'content-type': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           data: {
             'type': types[Number(this.data.taskTypeSelection)],
@@ -351,11 +354,12 @@ Page({
         console.log('PUT /task/publisher/{taskId}')
         console.log(this.data.tags)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID ,
           method: 'PUT',
           header: {
             'accept': 'application/json',
-            'content-type': 'application/json'
+            'content-type': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           data: {
             'type': types[Number(this.data.taskTypeSelection)],
@@ -615,10 +619,11 @@ Page({
       console.log('GET /task/publisher')
       console.log('search_value: ' + this.data.search_value)
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value ,
         method: 'GET',
         header: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          "Cookie": app.globalData.sessionKey
         },
         success(res) {
           console.log(res)
@@ -638,21 +643,31 @@ Page({
               taskList.push(_atask)
             })
             resolve('ok')
+          }else{
+            resolve('null')
           }
-          resolve('null')
+          
         }
       })
     })
     taskPromise.then((res) => {
+      if (res == 'null') {
+        wx.showToast({
+          title: '空空如也',
+          icon: 'none',
+          duration: 2000,
+        })
+      }
       return new Promise((resolve,reject)=>{
 
         //获取账户余额
 
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1//user/?' ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             balance=res.data.balance
@@ -743,10 +758,11 @@ Page({
         console.log('GET /task/publisher')
         console.log('search_value: ' + this.data.search_value)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value + '&userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page=0&keyword=' + this.data.search_value ,
           method: 'GET',
           header: {
             'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             console.log(res)
@@ -766,17 +782,27 @@ Page({
                 taskList.push(_atask)
               })
               resolve('ok')
+            }else{
+              resolve('null')
             }
-            resolve('null')
+            
           }
         })
       }).then((res)=>{
+        if (res == 'null') {
+          wx.showToast({
+            title: '空空如也',
+            icon: 'none',
+            duration: 2000,
+          })
+        }
         return new Promise((resolve,reject)=>{
           wx.request({
-            url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+            url: 'https://www.wtysysu.cn:10443/v1//user/?' ,
             method: 'GET',
             header: {
-              'accept': 'application/json'
+              'accept': 'application/json',
+              "Cookie": app.globalData.sessionKey
             },
             success(res) {
               balance = res.data.balance
@@ -817,10 +843,11 @@ Page({
         //获取账户余额
 
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1//user/?' + 'userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1//user/?' ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             balance = res.data.balance
@@ -854,10 +881,11 @@ Page({
         console.log('GET /task/publisher')
         console.log('search_value: ' + this.data.search_value)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page='+(this.data.currentPage+1)+'&keyword=' + this.data.search_value + '&userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task/publisher?page='+(this.data.currentPage+1)+'&keyword=' + this.data.search_value ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             console.log(res)

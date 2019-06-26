@@ -6,7 +6,7 @@ var states = ['pending', 'doing', 'finished']
 
 var checkState = ['unchecked', 'passed', 'unpassed']
 var types = ['questionnaire', 'errand']
-
+var app = getApp();
 
 
 /*此数据代表用户的验收情况，现已通过后端获取，无需本地
@@ -41,7 +41,9 @@ Page({
     tags: [],
     questionnairePath: null,
     type: '',
-
+    hasAccept:0,
+    
+    finishNum:0,
     //任务审核时用户上传的资料
     usersData: [],
 
@@ -100,10 +102,11 @@ Page({
     let taskPromise = new Promise((resolve, reject) => {
       console.log('DELETE /task/publisher/{taskId}')
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID + '?userId=2',
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + this.data.taskID ,
         method: 'DELETE',
         header: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          "Cookie": app.globalData.sessionKey
         },
         success(res) {
           console.log(res)
@@ -118,7 +121,7 @@ Page({
           url: '../main/main',
           success: () => {
             wx.showToast({
-              title: '删除成功',
+              title: '删除任务成功',
               icon: 'success',
               duration: 2000,
             })
@@ -126,7 +129,7 @@ Page({
         })
       } else {
         wx.showToast({
-          title: resolve.message,
+          title: '删除任务失败',
           icon: 'none',
           duration: 2000,
         })
@@ -138,11 +141,11 @@ Page({
    * 开启支付对话框
    */
   showCustomDialog() {
-    this.setData({ showDialog: true });
+    this.setData({ showDialog: true });   
   },
 
   /**
-   * 
+   * 修改任务
    */
   changeTask() {
     let info = {
@@ -171,24 +174,179 @@ Page({
    * 关闭支付的对话窗口
    */
   onCloseDialog(event) {
+    
     if (event.detail === 'confirm') {
-      setTimeout(() => {
+     
+        
+        
+      console.log('验收提交')
+      let passedUsers = []
+      let unpassedUsers = []
+
+      let usersDataTemp = this.data.usersData
+      //提交之后刷新页面
+      for (let i = 0; i < usersDataTemp.length; i++) {
+        //对之前未验收的进行验收
+        if (usersDataTemp[i].state == checkState[0]) {
+          if (this.data.isPass[i]) {
+            usersDataTemp[i].state = checkState[1]
+            passedUsers.push(usersDataTemp[i].userID)
+          } else if (this.data.isUnPass[i]) {
+            usersDataTemp[i].state = checkState[2]
+            unpassedUsers.push(usersDataTemp[i].userID)
+          }
+        } else if (usersDataTemp[i].state == checkState[1]) {
+          passedUsers.push(usersDataTemp[i].userID)
+        } else if (usersDataTemp[i].state == checkState[2]) {
+          unpassedUsers.push(usersDataTemp[i].userID)
+        }
+      }
+
+      console.log(usersDataTemp)
+
+
+      //验收的提交内容为usersDataTemp,
+      //usersDataTemp是一个列表，单个的数据结构为 
+      //{  userID: 用户ID,
+      //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
+      // }
+
+      if (passedUsers.length == 0 && unpassedUsers.length == 0) {
+        wx.showToast({
+          title: '未验收任何用户',
+          icon: 'none',
+          duration: 2000
+        })
         this.setData({
           showDialog: false
-        });
-        wx.showToast({
-          title: '支付成功',
-          icon: 'success',
         })
+        return
+      }
 
-      }, 1000);
+
+      let confirmTimes = 2
+      if (passedUsers.length == 0) {
+        confirmTimes -= 1
+      }
+      if (unpassedUsers.length == 0) {
+        confirmTimes -= 1
+      }
+
+      let taskPromise = new Promise((resolve, reject) => {
+        console.log('POST /task/publisher/confirm/{taskId}')
+        let confirms = []
+        if (passedUsers.length != 0) {
+          wx.request({
+            url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID,
+            method: 'POST',
+            header: {
+              'accept': 'application/json',
+              'content-type': 'application/json',
+              "Cookie": app.globalData.sessionKey
+            },
+            data: {
+              'checkState': "passed",
+              'users': passedUsers
+            },
+            success(res) {
+              console.log(res)
+              confirms.push(res.data)
+              if (confirms.length == confirmTimes) {
+                resolve(confirms)
+              }
+            }
+          })
+        }
+        if (unpassedUsers.length != 0) {
+          wx.request({
+            url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID,
+            method: 'POST',
+            header: {
+              'accept': 'application/json',
+              'content-type': 'application/json',
+              "Cookie": app.globalData.sessionKey
+            },
+            data: {
+              'checkState': "unpassed",
+              'users': unpassedUsers
+            },
+            success(res) {
+              console.log(res)
+              confirms.push(res.data)
+              if (confirms.length == confirmTimes) {
+                resolve(confirms)
+              }
+            }
+          })
+        }
+
+      })
+
+      taskPromise.then((resolve) => {
+        if (resolve.length == 1 && resolve[0].success) {
+          wx.navigateTo({
+            url: '../main/main',
+            success: () => {
+              wx.showToast({
+                title: '验收成功',
+                icon: 'success',
+                duration: 2000
+              })
+              this.setData({
+                showDialog: false
+              })
+            }
+          })
+        } else if (resolve.length == 2 && resolve[0].success && resolve[1].success) {
+          wx.navigateTo({
+            url: '../main/main',
+            success: () => {
+              wx.showToast({
+                title: '验收成功',
+                icon: 'success',
+                duration: 2000
+              })
+              this.setData({
+                showDialog: false
+              })
+            }
+          })
+        } else {
+          wx.showToast({
+            title: '验收失败',
+            icon: 'none',
+            duration: 2000
+          })
+          this.setData({
+            showDialog: false
+          })
+        }
+      })
+
+      
+
+     
     } else {
       this.setData({
         showDialog: false
       });
+      
     }
+    
+    
   },
 
+  /**
+     * 提交验收评价
+     */
+  submitChecked() {
+    //支付
+    this.showCustomDialog()
+    //提交任务的函数转移到onCloseDialog
+
+
+
+  },
 
   /**
    * 验收单个
@@ -265,151 +423,7 @@ Page({
 
   },
 
-  /**
-   * 提交验收评价
-   */
-  submitChecked() {
-    //支付
-    this.showCustomDialog({
-      success: () => {
-        console.log('asd')
-      }
-    })
-
-    console.log('验收提交')
-    let passedUsers = []
-    let unpassedUsers = []
-
-    let usersDataTemp = this.data.usersData
-    //提交之后刷新页面
-    for (let i = 0; i < usersDataTemp.length; i++) {
-      //对之前未验收的进行验收
-      if (usersDataTemp[i].state == checkState[0]) {
-        if (this.data.isPass[i]) {
-          usersDataTemp[i].state = checkState[1]
-          passedUsers.push(usersDataTemp[i].userID)
-        } else if (this.data.isUnPass[i]) {
-          usersDataTemp[i].state = checkState[2]
-          unpassedUsers.push(usersDataTemp[i].userID)
-        } 
-      } else if (usersDataTemp[i].state == checkState[1]) {
-        passedUsers.push(usersDataTemp[i].userID)
-      } else if (usersDataTemp[i].state == checkState[2]) {
-        unpassedUsers.push(usersDataTemp[i].userID)
-      }
-    }
-
-    console.log(usersDataTemp)
-
-
-    //验收的提交内容为usersDataTemp,
-    //usersDataTemp是一个列表，单个的数据结构为 
-    //{  userID: 用户ID,
-    //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
-    // }
-
-    if (passedUsers.length == 0 && unpassedUsers.length == 0) {
-      wx.showToast({
-        title: '未验收任何用户',
-        icon: 'none',
-        duration: 2000
-      })
-      return
-    }
-
-    
-    let confirmTimes = 2
-    if (passedUsers.length == 0) {
-      confirmTimes -= 1
-    }
-    if (unpassedUsers.length == 0) {
-      confirmTimes -= 1
-    }
-
-    let taskPromise = new Promise((resolve, reject) => {
-      console.log('POST /task/publisher/confirm/{taskId}')
-      let confirms = []
-      if (passedUsers.length != 0) {
-        wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID + '?userId=2',
-          method: 'POST',
-          header: {
-            'accept': 'application/json',
-            'content-type': 'application/json'
-          },
-          data: {
-            'checkState': "passed",
-            'users': passedUsers
-          },
-          success(res) {
-            console.log(res)
-            confirms.push(res.data)
-            if (confirms.length == confirmTimes) {
-              resolve(confirms)
-            }
-          }
-        })
-      }
-      if (unpassedUsers.length != 0) {
-        wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID + '?userId=2',
-          method: 'POST',
-          header: {
-            'accept': 'application/json',
-            'content-type': 'application/json'
-          },
-          data: {
-            'checkState': "unpassed",
-            'users': unpassedUsers
-          },
-          success(res) {
-            console.log(res)
-            confirms.push(res.data)
-            if (confirms.length == confirmTimes) {
-              resolve(confirms)
-            }
-          }
-        })
-      }
-
-    })
-
-    taskPromise.then((resolve) => {
-      if(resolve.length == 1 && resolve[0].success) {
-        wx.navigateTo({
-          url: '../main/main',
-          success: () => {
-            wx.showToast({
-              title: '验收成功',
-              icon: 'success',
-              duration: 2000
-            })
-          }
-        })
-      } else if (resolve.length == 2 && resolve[0].success && resolve[1].success) {
-        wx.navigateTo({
-          url: '../main/main',
-          success: () => {
-            wx.showToast({
-              title: '验收成功',
-              icon: 'success',
-              duration: 2000
-            })
-          }
-        })
-      } else {
-        wx.showToast({
-          title: '验收失败',
-          icon: 'none',
-          duration: 2000
-        })
-      }
-    })
-
-    this.setData({
-      usersData: usersDataTemp
-    })
-  },
+  
 
   /**
    * 生命周期函数--监听页面加载
@@ -422,10 +436,11 @@ Page({
     let taskPromise1 = new Promise((resolve, reject) => {
       console.log('GET /task/publisher/confirm/{taskId}')
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + options.taskID + '?userId=2',
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + options.taskID ,
         method: 'GET',
         header: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          "Cookie": app.globalData.sessionKey
         },
         success(res) {
           console.log(res)
@@ -496,10 +511,11 @@ Page({
     let taskPromise2 = new Promise((resolve, reject) => {
       console.log('GET /task/publisher/{taskId}')
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + options.taskID + '?userId=2',
+        url: 'https://www.wtysysu.cn:10443/v1/task/publisher/' + options.taskID,
         method: 'GET',
         header: {
-          'accept': 'application/json'          
+          'accept': 'application/json'  ,
+          "Cookie": app.globalData.sessionKey        
         },
         success(res) {
           console.log(res)
@@ -521,7 +537,9 @@ Page({
         type: resolve.type,
         taskTypeSelection: (resolve.type == types[0] ? "0" : "1"),
         taskDDL: resolve.deadline,
-        taskMaxAccept: resolve.maxAccept
+        taskMaxAccept: resolve.maxAccept,
+        hasAccept:resolve.hasAccept,
+        finishNum:resolve.finishNum
       })
       
 

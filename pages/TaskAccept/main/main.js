@@ -1,7 +1,7 @@
 // pages/TaskAccept/main/main.js
 var states=['pending','doing','checking','other']
 var types = ['questionnaire', 'errand']
-
+var app = getApp();
 
 Page({
 
@@ -52,7 +52,11 @@ Page({
     //用来缓存未被加入PendingTasks DoingTasks等的task
     myTasksTemp:[],
 
-    userInfo:null
+    userInfo:null,
+
+    windowHeight:0,
+    windowWidth:0,
+    
   },
 
   /**
@@ -305,10 +309,11 @@ Page({
       console.log('GET /task')
 
       wx.request({
-        url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+        url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main,
         method: 'GET',
         header: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          "Cookie": app.globalData.sessionKey
         },
         success(res) {
           if (Array.isArray(res.data)&&res.data.length>0) {
@@ -446,7 +451,9 @@ Page({
     if (options.selection != null) {
       this.setData({
         selection: options.selection,
-        active: options.selection
+        active: options.selection,
+        windowHeight: wx.getSystemInfoSync().windowHeight,
+        windowWidth: wx.getSystemInfoSync().windowWidth
       })
       this.onPullDownRefresh()
     } else {
@@ -457,10 +464,11 @@ Page({
         console.log('GET /task')
         console.log('search main value: ' + this.data.search_value_main)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             console.log(res)
@@ -505,7 +513,9 @@ Page({
           myPendingTasks: [],
           myDoingTasks: [],
           myCheckingTasks: [],
-          myOtherTasks: []
+          myOtherTasks: [],
+          windowHeight: wx.getSystemInfoSync().windowHeight,
+          windowWidth: wx.getSystemInfoSync().windowWidth
         })
 
         console.log(taskListPre)
@@ -568,10 +578,11 @@ Page({
         console.log('GET /task')
         console.log('keyword',this.data.search_value_main)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main + '&userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task?page=0&keyword=' + this.data.search_value_main ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             if (Array.isArray(res.data)&&res.data.length>0) {
@@ -633,10 +644,11 @@ Page({
         console.log('GET /task/recipient')
         console.log('search value personal: ' + this.data.search_value_personal)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page=0&keyword=' + this.data.search_value_personal + '&userId=3',
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page=0&keyword=' + this.data.search_value_personal ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             console.log(res)
@@ -721,10 +733,11 @@ Page({
         console.log('GET /task')
 
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task?page='+(this.data.currentTaskListPage+1)+'&keyword=' + this.data.search_value_main + '&userId=2',
+          url: 'https://www.wtysysu.cn:10443/v1/task?page='+(this.data.currentTaskListPage+1)+'&keyword=' + this.data.search_value_main ,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             if (Array.isArray(res.data) && res.data.length>0) {
@@ -779,10 +792,11 @@ Page({
         console.log('GET /task/recipient')
         console.log('search value personal: ' + this.data.search_value_personal)
         wx.request({
-          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page='+(this.data.currentMyTasksPage+1)+'&keyword=' + this.data.search_value_personal + '&userId=3',
+          url: 'https://www.wtysysu.cn:10443/v1/task/recipient?page='+(this.data.currentMyTasksPage+1)+'&keyword=' + this.data.search_value_personal,
           method: 'GET',
           header: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            "Cookie": app.globalData.sessionKey
           },
           success(res) {
             console.log(res)
