@@ -67,11 +67,11 @@ Page({
     steps: [
       {
         text: '待审核阶段',
-        desc: '审核中，这里可以自己根据需要修改'
+        desc: '审核中，请等待milky money后台审核'
       },
       {
         text: '进行阶段',
-        desc: '进行中，这里可以自己根据需要修改'
+        desc: '进行中，请尽快审核用户提交情况'
       },
       {
         text: '已完成',
@@ -100,7 +100,7 @@ Page({
     //支付的对话框
     showDialog: false,
     password: '',
-    titleDialog: '您需要支付xx元'
+    titleDialog: '您需要输入确认支付密码'
   },
 
   /**
@@ -445,9 +445,9 @@ Page({
         })
       }
 
-      usersDataTemp.push(user1_data)
-      usersDataTemp.push(user2_data)
-      usersDataTemp.push(user3_data)
+      //usersDataTemp.push(user1_data)
+      //usersDataTemp.push(user2_data)
+      //usersDataTemp.push(user3_data)
 
       console.log(usersDataTemp)
 
