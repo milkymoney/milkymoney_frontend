@@ -45,6 +45,7 @@ Page({
     //发布的任务类型，0-问卷，1-跑腿
     taskTypeSelection:'0',
     taskDDL:'',
+    taskDate: new Date(),
     taskReward:1,
     taskName:'',
     taskInfo:'',
@@ -203,6 +204,7 @@ Page({
     const date = new Date(detail);
     const dataStr = date.toLocaleString()
     this.setData({
+      taskDate: date,
       taskDDL: dataStr
     })
     this.toggleBottomPopup()
@@ -287,12 +289,23 @@ Page({
 
     if (this.data.taskDDL.length == 0) {
       wx.showToast({
-        title: '任务时间不能空!',
+        title: '任务DDL不能空!',
         icon: 'none',
         duration: 2000
       })
       return
     }
+
+    let currentDate = new Date()
+    if (currentDate > this.data.taskDate) {
+      wx.showToast({
+        title: '任务DDL应设置为将来时刻!',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+    
     
     //这里可以发布新任务，也是修改任务的地方
     if (!this.data.isModifyTask) {
@@ -329,21 +342,29 @@ Page({
         if (resolve.success) {
           //完成发布或者修改
           wx.showToast({
-            title: '发布成功', // '已发布成功/修改'
+            title: resolve.message, // '已发布成功/修改'
             icon: 'success',
             duration: 2000,
             success: () => {
               //跳转界面
+              console.log(this.data)
               this.setData({
                 selection: 3,
-                active: 3
+                active: 3,
+                // 发布之后清空填入值
+                taskName: '',
+                taskInfo: '',
+                tags: '',
+                taskDDL: '',
+                taskMaxAccept: 1,
+                taskReward: 1
               });
               this.onPullDownRefresh()
             }
           })
         } else {
           wx.showToast({
-            title: '发布失败',
+            title: resolve.message,
             icon: 'none',
             duration: 2000,
           })
@@ -366,7 +387,7 @@ Page({
             'description': this.data.taskInfo,
             'reward': this.data.taskReward,
             'deadline': this.data.taskDDL,
-            'label': this.data.tags,
+            'label': cleanTags,
             'taskName': "",
             'priority': 0,
             'maxAccept': this.data.taskMaxAccept,
@@ -386,21 +407,28 @@ Page({
         if (resolve.success) {
           //完成发布或者修改
           wx.showToast({
-            title: '修改成功', // '已发布成功/修改'
+            title: resolve.message, // '已发布成功/修改'
             icon: 'success',
             duration: 2000,
             success: () => {
               //跳转界面
               this.setData({
                 selection: 3,
-                active: 3
+                active: 3,
+                // 修改之后清空填入值
+                taskName: '',
+                taskInfo: '',
+                tags: '',
+                taskDDL: '',
+                taskMaxAccept: 1,
+                taskReward: 1
               });
               this.onPullDownRefresh()
             }
           })
         } else {
           wx.showToast({
-            title: '修改失败',
+            title: resolve.message,
             icon: 'none',
             duration: 2000,
           })

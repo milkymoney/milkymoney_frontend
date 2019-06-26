@@ -169,8 +169,14 @@ Page({
           }
         })
       } else {
+        let msg = ''
+        if (resolve.message.replace(/[0-9]/g, '') == "用户已经接受了任务") {
+          msg = '用户已经接受过该任务'
+        } else {
+          msg = resolve.message
+        }
         wx.showToast({
-          title: '接收任务失败',
+          title: msg,
           icon: 'none',
           duration: 2000,
         })
