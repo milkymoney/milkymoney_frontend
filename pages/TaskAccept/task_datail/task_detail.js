@@ -72,12 +72,15 @@ Page({
     let taskPromise = new Promise((resolve, reject) => {
       console.log('POST /task/recipient/settleup/{taskId}')
       let failed = []
+      let postIndex = 1
+      let imagesNum = this.data.images.length
       wx.showToast({
         title: '图片上传中',
         icon: 'loading',
-        duration: 10000
+        duration: 100000
       })
-      for (var imgIndex = 0; imgIndex < this.data.images.length; ++imgIndex) {
+      
+      for (var imgIndex = 0; imgIndex < imagesNum; ++imgIndex) {
         wx.uploadFile({
           url: 'https://www.wtysysu.cn:10443/v1/task/recipient/settleup/' + this.data.taskID + '?userId=3',
           filePath: this.data.images[imgIndex],
@@ -91,16 +94,22 @@ Page({
           success(res) {
             let data = JSON.parse(res.data)
             if (!data.success) {
-              failed.push(String(imgIndex))
+              failed.push(String(postIndex))
+              postIndex += 1
+            } else {
+              postIndex += 1
             }
             console.log(data)
-            resolve(failed)
+            if (postIndex == imagesNum + 1) {
+              resolve(failed)
+            }
           }
         })
       }
     })
 
     taskPromise.then((resolve) => {
+      console.log(resolve)
       if (resolve.length == 0) {
         wx.navigateTo({
           url: '../main/main?selection=3',

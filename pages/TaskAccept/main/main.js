@@ -433,6 +433,9 @@ Page({
    * 将获取到的任务push进taskListPre
    */
   onLoad: function (options) {
+
+    console.log('user API')
+
     console.log(options)
     if (options.selection != null) {
       this.setData({

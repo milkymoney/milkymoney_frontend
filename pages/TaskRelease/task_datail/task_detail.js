@@ -287,7 +287,11 @@ Page({
    */
   submitChecked() {
     //支付
-    this.showCustomDialog()
+    this.showCustomDialog({
+      success: () => {
+        console.log('safqe')
+      }
+    })
 
     console.log('验收提交')
     let uncheckedUsers = []
@@ -325,9 +329,20 @@ Page({
     //{  userID: 用户ID,
     //   checkState: 该用户的验收情况'unchecked','passed','unpassed'
     // }
+    let failed = []
+    let postIndex = 1
+    let postLength = 2
     let taskPromise = new Promise((resolve, reject) => {
       console.log('POST /task/publisher/confirm/{taskId}')
-      for(var i = 0; i < 3; ++i) {
+      for(var i = 1; i < 3; ++i) {
+        if (users[i].length == 0) {
+          postLength -= 1
+        }
+      }
+      for(var i = 1; i < 3; ++i) {
+        if(users[i].length == 0) {
+          continue
+        }
         wx.request({
           url: 'https://www.wtysysu.cn:10443/v1/task/publisher/confirm/' + this.data.taskID + '?userId=2',
           method: 'POST',
@@ -336,12 +351,42 @@ Page({
             'content-type': 'application/json'
           },
           data: {
-            'checkState': checkState[i],
+            'confirm': checkState[i],
             'users': users[i]
           },
           success(res) {
             console.log(res)
+            if (res.data.success) {
+              postIndex += 1
+            } else {
+              failed.push(String(postIndex))
+              postIndex += 1
+            }
+            if (postIndex == postLength + 1) {
+              resolve(failed)
+            }
           }
+        })
+      }
+    })
+
+    taskPromise.then((resolve) => {
+      if(resolve.length == 0) {
+        wx.navigateTo({
+          url: '../main/main',
+          success: () => {
+            wx.showToast({
+              title: '验收成功',
+              icon: 'success',
+              duration: 2000
+            })
+          }
+        })
+      } else {
+        wx.showToast({
+          title: '验收失败',
+          icon: 'none',
+          duration: 2000
         })
       }
     })
@@ -387,8 +432,15 @@ Page({
           let user_data = {
             state: user_info.checkState,
             userID: user_info.id,
-            imageURL: user_info.proves
+            imagesURL: []
           }
+
+          if (Array.isArray(user_info.proves)) {
+            user_info.proves.forEach(function(img) {
+              user_data.imagesURL.push('https://www.wtysysu.cn:10443/image/' + img)
+            })
+          }
+
           usersDataTemp.push(user_data)
         })
       }
@@ -396,6 +448,8 @@ Page({
       usersDataTemp.push(user1_data)
       usersDataTemp.push(user2_data)
       usersDataTemp.push(user3_data)
+
+      console.log(usersDataTemp)
 
       // 简单排序等待验收的接受者，其中unchecked的排在前面，其次是passed，最后是unpassed
       let checkState2i = { "unchecked": 0, "passed": 1, "unpassed": 2}
