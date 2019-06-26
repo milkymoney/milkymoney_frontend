@@ -7,9 +7,9 @@ var states = ['pending', 'doing', 'finished']
 var checkState = ['unchecked', 'passed', 'unpassed']
 var types = ['questionnaire', 'errand']
 
-//暂时采用下面的数据模拟
 
 
+/*此数据代表用户的验收情况，现已通过后端获取，无需本地
 var user1_data = {
 
   state: checkState[0],
@@ -19,24 +19,7 @@ var user1_data = {
     'http://img3.imgtn.bdimg.com/it/u=2932025398,934944233&fm=26&gp=0.jpg',
     'http://img4.imgtn.bdimg.com/it/u=3475521849,1650563933&fm=26&gp=0.jpg']
 }
-
-var user2_data = {
-  state: checkState[1],
-  userID: 256,
-  imagesURL: [
-    'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2103157768,145332811&fm=26&gp=0.jpg',
-    'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1687278852,3241220207&fm=26&gp=0.jpg',
-    'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=823267616,3499131309&fm=26&gp=0.jpg']
-}
-
-var user3_data = {
-  state: checkState[0],
-  userID: 678,
-  imagesURL: [
-    'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=327905910,2036501133&fm=26&gp=0.jpg',
-    'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=145022413,4184144031&fm=26&gp=0.jpg',
-    'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1290220413,1365829772&fm=26&gp=0.jpg']
-}
+*/
 
 
 Page({
@@ -322,8 +305,7 @@ Page({
 
     console.log(usersDataTemp)
 
-    ////////////////////////////////
-    //
+
     //验收的提交内容为usersDataTemp,
     //usersDataTemp是一个列表，单个的数据结构为 
     //{  userID: 用户ID,
@@ -390,8 +372,6 @@ Page({
         })
       }
     })
-    //
-    ////////////////////////////////
 
     this.setData({
       usersData: usersDataTemp
@@ -402,13 +382,10 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    //console.log(options)
 
-    //////////////////////////////
-    //
     //这里需要根据taskID获取对应的信息
     //将获取到的待验收信息push进usersDataTemp
-    //
+
     let taskPromise1 = new Promise((resolve, reject) => {
       console.log('GET /task/publisher/confirm/{taskId}')
       wx.request({
@@ -445,9 +422,7 @@ Page({
         })
       }
 
-      //usersDataTemp.push(user1_data)
-      //usersDataTemp.push(user2_data)
-      //usersDataTemp.push(user3_data)
+
 
       console.log(usersDataTemp)
 
