@@ -265,6 +265,7 @@ Page({
 
     //默认为other
     let taskState = states[3]
+    let questionID = 0
 
     //根据taskID获取对应任务的state   
     let statePromise = new Promise((resolve, reject) => {
@@ -285,7 +286,7 @@ Page({
           else  {
             taskState = states[res.data.state]
           }
-          
+          questionID = res.data.questionID
           resolve('ok')
         }
       })
@@ -300,7 +301,7 @@ Page({
         imageURL: (options.type == types[0]) ? "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116589263&di=4ee6608f899a109627f89361a708c231&imgtype=0&src=http%3A%2F%2Fuploads.5068.com%2Fallimg%2F171124%2F1-1G124163233.jpg" : "//timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556116323349&di=6be5283ffd7a6358d50df808562a0c5d&imgtype=0&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F01%2F11%2F96%2F52%2F59608df330036.png",
         tags: options.tags.split(/\s+/),
         state: taskState,
-        questionnairePath: (options.type == types[0] ? "pages/wjxqList/wjxqList?activityId=39109067" : null),
+        questionnairePath: (options.type == types[0] ? "pages/wjxqList/wjxqList?activityId=" + questionID : null),
         type: options.type
       })
 
