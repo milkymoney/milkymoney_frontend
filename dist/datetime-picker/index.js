@@ -1,6 +1,9 @@
 import { VantComponent } from '../common/component';
 import { isDef } from '../common/utils';
 const currentYear = new Date().getFullYear();
+const currentMonth=new Date().getMonth();
+const currentDay=new Date().getDate();
+
 function isValidDate(date) {
     return isDef(date) && !isNaN(new Date(date).getTime());
 }
@@ -60,7 +63,7 @@ VantComponent({
         },
         minDate: {
             type: Number,
-            value: new Date(currentYear - 10, 0, 1).getTime()
+            value: new Date(currentYear , currentMonth, currentDay).getTime()
         },
         maxDate: {
             type: Number,
