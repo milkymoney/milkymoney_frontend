@@ -89,8 +89,14 @@ Page({
           selectedTask = atask
         }
       })
-    }else{
+    }else if(this.data.selection==0){
       this.data.taskList.forEach(function (atask) {
+        if (atask.taskID == event.target.id) {
+          selectedTask = atask
+        }
+      })
+    }else if(this.data.selection==1){
+      this.data.seletcedTaskList.forEach(function (atask) {
         if (atask.taskID == event.target.id) {
           selectedTask = atask
         }
@@ -100,13 +106,14 @@ Page({
     
 
     console.log(selectedTask)
+    /*这里对对象修改涉及到地址引用，是错误的，应该对值引用进行修改
     if (Array.isArray(selectedTask.tags)){
       selectedTask.tags = selectedTask.tags.join(' ')
-    }
-
+    }*/
+    console.log(this.data.seletcedTaskList)
     wx.navigateTo({
       url: '../task_datail/task_detail?taskID=' + selectedTask.taskID 
-                      + '&tags=' + selectedTask.tags 
+        + '&tags=' + (Array.isArray(selectedTask.tags) ? selectedTask.tags.join(' ') : selectedTask.tags)
                       + '&taskReward=' + selectedTask.taskReward
                       + '&taskInfo=' + selectedTask.taskInfo
                       + '&taskName=' + selectedTask.taskName
@@ -171,10 +178,11 @@ Page({
   onConfirmTaskType(event) {
     const { picker, value, index } = event.detail;
     
-    console.log("onConfirmTaskType:"+this.data.taskTypeSelected);
+    
     this.setData({
       taskTypeSelected: value
     });
+    console.log("onConfirmTaskType:" + this.data.taskTypeSelected);
     this.toggleBottomPopup()
 
     
